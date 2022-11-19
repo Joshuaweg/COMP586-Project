@@ -7,7 +7,6 @@ using FirebaseConnector.Controllers;
 patientsController pat = new patientsController();
 
 var builder = WebApplication.CreateBuilder(args);
-Dictionary<string,string>creds = await pat.getDocuments("patients");
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
