@@ -17,7 +17,7 @@ namespace FirebaseConnector.Controllers
             Dictionary<string, object> patient = new Dictionary<string, object>();
             if (record.ID != null) patient.Add("ID", record.ID);
             if (record.patient != null) patient.Add("patient", record.patient);
-            if (record.amount != null) patient.Add("amouont", record.amount);
+            if (record.amount != null) patient.Add("amount", record.amount);
             await docRef.SetAsync(patient, SetOptions.MergeAll);
 
         }
@@ -27,7 +27,7 @@ namespace FirebaseConnector.Controllers
             DocumentReference cityRef = connect.Collection("patientbills").Document(documentid);
             await cityRef.DeleteAsync();
         }
-        public async Task retrieveDocumentAsync(string documentid)
+        public async Task<Dictionary<string, object>> retrieveDocumentAsync(string documentid)
         {
             FirestoreDb connect = createConnection();
             DocumentReference docRef = connect.Collection("patientbills").Document(documentid);
@@ -40,10 +40,12 @@ namespace FirebaseConnector.Controllers
                 {
                     Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
                 }
+                return city;
             }
             else
             {
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
+                return null;
             }
         }
         public async Task updateDocumentAsync(string documentid, patientbills record)
@@ -53,7 +55,7 @@ namespace FirebaseConnector.Controllers
             Dictionary<string, object> patient = new Dictionary<string, object>();
             if (record.ID != null) patient.Add("ID", record.ID);
             if (record.patient != null) patient.Add("patient", record.patient);
-            if (record.amount != null) patient.Add("amouont", record.amount);
+            if (record.amount != null) patient.Add("amount", record.amount);
 
             await docRef.UpdateAsync(patient);
 
