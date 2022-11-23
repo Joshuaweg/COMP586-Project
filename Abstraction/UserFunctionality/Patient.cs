@@ -2,13 +2,22 @@ using System;
 using System.Collections.Generic; 
 using Npgsql;
 using System.Data;
+<<<<<<< HEAD
 
 class Patient : PatientInterface, ChatHandler{
+=======
+using FirebaseConnector.Models;
+using FirebaseConnector.Controllers;
+using System.Threading.Tasks;
+
+class Patient : PatientInterface {
+>>>>>>> 5df528a28e8c50372c71f9c8ad307d38fdd9f724
     public string name;
     public Patient(string name) {
         this.name = name.ToLower();
     }
 
+<<<<<<< HEAD
     public override void viewPrescriptions() {
         Console.WriteLine("\nList of Prescriptions: ");
         using(NpgsqlConnection con = base.GetConnection()) {
@@ -150,4 +159,54 @@ class Patient : PatientInterface, ChatHandler{
 
     //Change doctors X
     //look at medication X
+=======
+    public override async Task<Dictionary<string, object>> viewPrescriptions(string patient) {
+        patientprescriptionsController controller = new patientprescriptionsController();
+        return await controller.retrieveDocumentAsync(patient);
+    }
+
+    public override async Task modifyAppointment(int id, string patient, DateTime time, string name) {
+        patientappointments info = new patientappointments();
+        info.ID = id;
+        info.patient = patient;
+        info.time = time.ToUniversalTime();
+        info.name = name;
+        string docName = name + "_" + id.ToString();
+        patientappointmentsController controller = new patientappointmentsController();
+        await controller.addDocumentAsync(info, docName);
+    }
+
+    public override async Task<Dictionary<string, object>> viewAppointment(string patient) {
+        patientappointmentsController controller = new patientappointmentsController();
+        return await controller.retrieveDocumentAsync(patient);
+    }
+
+    public override async Task payBill(string patient) {
+        patientbillsController controller = new patientbillsController();
+        await controller.deleteDocumentAsync(patient);
+    }
+
+    public override async Task updateInformation(patients patient) {
+        patientsController controller = new patientsController();
+        await controller.deleteDocumentAsync(patient.patient);
+        await controller.addDocumentAsync(patient, patient.patient);
+    }
+
+    public override async Task<Dictionary<string, object>> readComments(string name) {
+        doctortopatientcommentsController controller = new doctortopatientcommentsController();
+        Dictionary<string, object> temp = await controller.retrieveDocumentAsync(name);
+        return temp;
+    }
+
+    public override async Task writeComments(int id, string from, string to, string message) {
+        patienttodoctorcomments info = new patienttodoctorcomments();
+        info.ID = id;
+        info.patient = from;
+        info.doctor = to;
+        info.message = message;
+        string docName = name + "_" + id.ToString();
+        patienttodoctorcommentsController controller = new patienttodoctorcommentsController();
+        await controller.addDocumentAsync(info, docName);
+    }
+>>>>>>> 5df528a28e8c50372c71f9c8ad307d38fdd9f724
 }
