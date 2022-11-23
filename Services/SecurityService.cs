@@ -25,9 +25,20 @@ namespace WebApplication1.Services
         public bool IsValid(UserModel user)
         {
             bool valid = false;
+            List<Dictionary<string, string>> ProfileGroups = new List<Dictionary<string, string>>();
+            ProfileGroups.Add(knownPatients);
+            ProfileGroups.Add(knownAdmins);
+            ProfileGroups.Add(knownDoctors);
             //return true if found in the list
-            string key = knownDoctors[user.UserName];
-            if (key != null && SHA256Hasher.ComputeHash(user.Password).Equals(key)) valid = true;
+            Console.WriteLine(user.profile.ToString());
+            try
+            {
+                string key = ProfileGroups[user.profile][user.UserName];
+                if (key != null && SHA256Hasher.ComputeHash(user.Password).Equals(key)) valid = true;
+            }
+            catch{
+                valid = false;
+            }
             return valid;
         }
     }

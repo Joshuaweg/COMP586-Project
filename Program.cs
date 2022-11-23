@@ -4,7 +4,6 @@ using System.Data;
 using System.Threading.Tasks;
 using FirebaseConnector.Controllers;
 
-patientsController pat = new patientsController();
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.

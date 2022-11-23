@@ -256,3 +256,4 @@ C:\Users\joshu\source\repos\COMP586 Front\Comp586-master\WebApplication1\bin\Deb
 C:\Users\joshu\source\repos\COMP586 Front\Comp586-master\WebApplication1\bin\Debug\net6.0\Grpc.Net.Client.dll
 C:\Users\joshu\source\repos\COMP586 Front\Comp586-master\WebApplication1\bin\Debug\net6.0\Grpc.Net.Common.dll
 C:\Users\joshu\source\repos\COMP586 Front\Comp586-master\WebApplication1\bin\Debug\net6.0\System.Linq.Async.dll
+C:\Users\joshu\source\repos\COMP586 Front\Comp586-master\WebApplication1\bin\Debug\net6.0\Npgsql.dll

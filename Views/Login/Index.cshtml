@@ -1,4 +1,4 @@
-﻿@model WebApplication1.Models.UserModel
+﻿ @model WebApplication1.Models.UserModel
 
 <h4>Please Login</h4>
 <hr />
@@ -16,6 +16,16 @@
                 <label asp-for="Password" class="control-label"></label>
                 <input asp-for="Password" class="form-control" type="password"/>
                 <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="profile" class="control-label"></label><br>
+                @{ UserModel um = new UserModel(); }
+                    @foreach( var profile in um.profiles)
+                {
+                <input type="radio" asp-for="profile" name="profile" value="@profile.Key"\>
+                @profile.Value.ToString();
+                <br>
+                }
             </div>
             <div class="form-group">
                 <input type="submit" value="Login" class="btn btn-primary" />
