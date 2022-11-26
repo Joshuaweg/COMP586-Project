@@ -29,7 +29,7 @@ namespace FirebaseConnector.Controllers
             DocumentReference cityRef = connect.Collection("doctortopatientcomments").Document(documentid);
             await cityRef.DeleteAsync();
         }
-        public async Task<Dictionary<string, object>> retrieveDocumentAsync(string documentid)
+        public async Task retrieveDocumentAsync(string documentid)
         {
             FirestoreDb connect = createConnection();
             DocumentReference docRef = connect.Collection("doctortopatientcomments").Document(documentid);
@@ -42,12 +42,10 @@ namespace FirebaseConnector.Controllers
                 {
                     Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
                 }
-                return city;
             }
             else
             {
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
-                return null;
             }
         }
         public async Task updateDocumentAsync(string documentid, doctortopatientcomments record)
