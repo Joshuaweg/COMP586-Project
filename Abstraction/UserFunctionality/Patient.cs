@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Npgsql;
 using System.Data;
 
-class Patient : PatientInterface, ChatHandler{
+class Patient : PatientInterface{
     public string name;
     public Patient(string name) {
         this.name = name.ToLower();

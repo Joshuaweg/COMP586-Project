@@ -48,6 +48,7 @@ namespace FirebaseConnector.Controllers
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
             }
         }
+        
         public async Task updateDocumentAsync(string documentid, doctorschedules record)
         {
             FirestoreDb connect = createConnection();

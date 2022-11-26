@@ -1,139 +1,144 @@
 using System;
 using System.Collections.Generic; 
-using Npgsql;
 using System.Data;
+using FirebaseConnector.Controllers;
+using FirebaseConnector.Models;
+using Google.Cloud.Firestore;
 
-class Doctor : DoctorInterface, ChatHandler {
+public class Doctor : DoctorInterface, ChatHandler {
     public string name;
     public Doctor(string name) {
         this.name = name.ToLower();
     }
 
-    public override void givePrescriptions() {
+    public override async Task givePrescriptions() {
         Console.WriteLine("\nEnter the name of the patient: ");
         string patientName = Console.ReadLine();
         Console.WriteLine("\nEnter the prescription: ");
         string prescriptionName = Console.ReadLine();
-        using(NpgsqlConnection con = base.GetConnection()) {    
-            string query = $"insert into patientprescriptions(patient,prescriptions)values('{patientName.ToLower()}','{prescriptionName.ToLower()}')";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            int n = cmd.ExecuteNonQuery();
-            if(n==1) {
-                Console.WriteLine("\nPrescription Made");
-            }
-            con.Close();
-        }
+        patientprescriptions prescribe = new patientprescriptions();
+        patientprescriptionsController pc = new patientprescriptionsController();
+        prescribe.patient = patientName;
+        prescribe.presciptions = prescriptionName;
+        await pc.addDocumentAsync(prescribe, patientName + prescriptionName);
+
     }
     
-    public override void viewAppointments() {
+    public override async Task<List<Dictionary<string,object>>> viewAppointments() {
         Console.WriteLine("\nList of Appointments: ");
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From doctorschedules";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if((string)reader[1] == name) {
-                    Console.WriteLine(reader[2] + ": " + reader[3] + " " + reader[4]);
-                }
+        List<Dictionary<string, object>> apointmentList = new List<Dictionary<string,object>>();
+        doctorschedulesController docsched = new doctorschedulesController();
+        Dictionary<string, object> qu = new Dictionary<string, object>();
+        qu.Add("doctor", name);
+        QuerySnapshot appointments= await docsched.Query("doctorschedules", qu);
+        foreach (var appointment in appointments.Documents) {
+            Dictionary<string, object> appt = appointment.ToDictionary();
+            apointmentList.Add(appt);
+            foreach (KeyValuePair<string, object> pair in appt)
+            {
+                Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
             }
-            con.Close();
         }
+        return apointmentList;
     }
 
-    public override void viewPatientInformation() {
-        Console.WriteLine("\nEnter the Full Name of the Patient:");
+    public override async Task<List<Dictionary<string,object>>> viewPatientInformation() {
+        List<Dictionary<string,object>> PatientList = new List<Dictionary<string ,object>>();
+        bool found = false;
+        Dictionary<string, object> fields = new Dictionary<string, object>();
         string patientName = Console.ReadLine();
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From patients  ";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            bool found = false;
-            while (reader.Read()) {
-                if(((string)reader[0]).ToLower() == patientName.ToLower()) {
-                    Console.WriteLine("Patient Information: ");
-                    Console.WriteLine("Date Of Birth: " + reader[3]);
-                    Console.WriteLine("Current Doctor: " + reader[4]);
-                    Console.WriteLine("Address: " + reader[5]);
-                    Console.WriteLine("Phone Number: " + reader[6]);
-                    Console.WriteLine("Insurance Provider: " + reader[7]);
-                    found = true;
-                    break;
+        fields.Add("patient", patientName);
+        fields.Add("doctor", name);
+        patientsController pc = new patientsController();
+
+        QuerySnapshot qu = await pc.Query("doctorinchargeofpatients", fields);
+
+        if (qu != null)
+        {
+            found = true;
+            foreach (var pat in qu.Documents)
+            {
+                Dictionary<string, object> pa = pat.ToDictionary();
+                PatientList.Add(pa);
+                foreach (KeyValuePair<string, object> pair in pa)
+                {
+                    Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
                 }
+
             }
-            if(!found) {
-                Console.WriteLine("\nPatient Not Found, Check Spelling/Punctuation");
-            }
-            con.Close();
         }
+        else {
+
+            PatientList.Add(new Dictionary<string, object>() { { "error", "not found" } });
+        }
+        return PatientList;
+
+
     }
 
-    public void readComments() {
-        Console.WriteLine("\nList of Patient Comments: ");
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From patienttodoctorcomments";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if(((string)reader[2]).ToLower() == name) {
-                    Console.WriteLine(reader[1] + ": " + reader[3]);
-                }
+    public async Task<List<Dictionary<string,object>>> readComments() {
+        List<Dictionary<string, object>> comments = new List<Dictionary<string, object>>();
+        bool found = false;
+        Dictionary<string, object> fields = new Dictionary<string, object>();
+        fields.Add("doctor", name);
+        patienttodoctorcommentsController pc = new patienttodoctorcommentsController();
+
+        QuerySnapshot qu = await pc.Query("patienttodoctorcomments", fields);
+        foreach (var comm in qu.Documents)
+        {
+            Dictionary<string, object> co = comm.ToDictionary();
+            comments.Add(co);
+            foreach (KeyValuePair<string, object> pair in co)
+            {
+                Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
             }
-            con.Close();
+
         }
-        Console.WriteLine("\nList of Admin Comments: ");
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From admintodoctorcomments";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if(((string)reader[2]).ToLower() == name) {
-                    Console.WriteLine(reader[1] + ": " + reader[3]);
-                }
+        qu = await pc.Query("admintodoctorcomments", fields);
+        foreach (var comm in qu.Documents)
+        {
+            Dictionary<string, object> co = comm.ToDictionary();
+            comments.Add(co);
+            foreach (KeyValuePair<string, object> pair in co)
+            {
+                Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
             }
-            con.Close();
+
         }
+
+
+        return comments;
     }
 
-    public void writeComments() {
-        Console.WriteLine("\nWho would you like to message (Admin or Patient): ");
-        string messageType = Console.ReadLine().ToLower();
-        if(messageType == "admin") {
-            Console.WriteLine("\nEnter the name of the admin to message: ");
-            string adminName = Console.ReadLine();
-            Console.WriteLine("\nEnter the message to send: ");
-            string message = Console.ReadLine();
-            using(NpgsqlConnection con = base.GetConnection()) {    
-                string query = $"insert into doctortoadmincomments(doctor,admin,message)values('{name.ToLower()}','{adminName.ToLower()}','{message}')";
-                NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-                con.Open();
-                int n = cmd.ExecuteNonQuery();
-                if(n==1) {
-                    Console.WriteLine("\nMessage Sent");
-                }
-                con.Close();
-            }
-        } else if(messageType == "patient") {
-            Console.WriteLine("\nEnter the name of the patient to message: ");
-            string patientName = Console.ReadLine();
-            Console.WriteLine("\nEnter the message to send: ");
-            string message = Console.ReadLine();
-            using(NpgsqlConnection con = base.GetConnection()) {    
-                string query = $"insert into doctortopatientcomments(doctor,patient,message)values('{name.ToLower()}','{patientName.ToLower()}','{message}')";
-                NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-                con.Open();
-                int n = cmd.ExecuteNonQuery();
-                if(n==1) {
-                    Console.WriteLine("\nMessage Sent");
-                }
-                con.Close();
-            }
+    public async Task writeComments(string recepient, string message) {
+        Dictionary<string, object> fields = new Dictionary<string, object>();
+        fields.Add("doctor", name);
+        fields.Add("patient", recepient);
+        doctortoadmincommentsController ac = new doctortoadmincommentsController();
+        doctortopatientcommentsController pc = new doctortopatientcommentsController();
+        QuerySnapshot qu = await ac.Query("patients", fields);
+        bool found = false;
+        if (qu != null) {
+            doctortopatientcomments dc = new doctortopatientcomments();
+            dc.patient = recepient;
+            dc.doctor = name;
+            dc.message=message;
+            await pc.addDocumentAsync(dc,name+"to"+recepient);
+            found = true;
         }
-        
+        fields.Remove("patient");
+        fields.Add("admin", recepient);
+        qu = await ac.Query("admininchargeofdoctor", fields);
+        if (qu != null) {
+            doctortoadmincomments dca = new doctortoadmincomments();
+            dca.admin = recepient;
+            dca.doctor = name;
+            dca.message = message;
+            await ac.addDocumentAsync(dca, name + "to" + recepient);
+            found = true;
+        }
+        if (!found) Console.WriteLine("Not found");
+
     }
 
     //Look at schedule X

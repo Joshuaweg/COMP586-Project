@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using Npgsql;
 using System.Data;
 
-class Admin : AdminInterface, ChatHandler {
+class Admin : AdminInterface {
     public string name;
     public Admin(string name) {
         this.name = name.ToLower();
     }
 
-    public override void orderSupplies() {
+    public override async Task orderSupplies() {
         Console.WriteLine("\nEnter the name of the product: ");
         string supplyName = Console.ReadLine().ToLower();
         Console.WriteLine("\nEnter the amount to order (lbs) (just the number): ");
@@ -59,7 +59,7 @@ class Admin : AdminInterface, ChatHandler {
         }
     }
 
-    public override void manageDoctors() {
+    public override async Task manageDoctors() {
         Console.WriteLine("\nEnter the name of the Doctor you want to fire: ");
         string firedDoctor = Console.ReadLine().ToLower();
         using(NpgsqlConnection con = base.GetConnection()) {    
@@ -74,7 +74,7 @@ class Admin : AdminInterface, ChatHandler {
         }
     }
 
-    public override void billCustomer() {
+    public override async Task billCustomer() {
         Console.WriteLine("\nEnter the name of the patient to bill: ");
         string patientName = Console.ReadLine().ToLower();
         Console.WriteLine("\nEnter the amount to charge (just the number): ");
@@ -124,7 +124,7 @@ class Admin : AdminInterface, ChatHandler {
         }
     }
 
-    public void readComments() {
+    public async Task readComments() {
         Console.WriteLine("\nList of Comments: ");
         using(NpgsqlConnection con = base.GetConnection()) {
             string query = $"Select * From doctortoadmincomments";
@@ -140,7 +140,7 @@ class Admin : AdminInterface, ChatHandler {
         }
     }
 
-    public void writeComments() {
+    public async Task writeComments() {
         Console.WriteLine("\nEnter the name of the doctor to message: ");
         string doctorName = Console.ReadLine();
         Console.WriteLine("\nEnter the message to send: ");

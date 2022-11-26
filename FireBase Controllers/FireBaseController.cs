@@ -29,6 +29,21 @@ namespace FirebaseConnector.Controllers
             }
             return creds;
         }
+        public async Task<QuerySnapshot> Query(string collect,Dictionary<string,object> fields)
+        {
+            FirestoreDb db = createConnection();
+            CollectionReference collectRef = db.Collection(collect);
+            Query query = collectRef;
+            foreach (string key in fields.Keys) {
+                query = query.WhereEqualTo(key, fields[key].ToString());
+            } 
+            QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
+            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
+            {
+                Console.WriteLine("Document {0} returned by query Capital=true", documentSnapshot.Id);
+            }
+            return querySnapshot;
+        }
 
     }
 }
