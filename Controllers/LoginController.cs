@@ -20,19 +20,19 @@ namespace WebApplication1.Controllers
             string[] profile_ = new string[] { "Patient", "Admin", "Doctor" };
             SecurityService securityService = new SecurityService();
             await securityService.fill();
-            if(securityService.IsValid(userModel) )
+            if(await securityService.IsValid(userModel) )
             {
                 FireBaseController fb;
                 if (userModel.profile == 0)
                 {
-                    fb = new patientsController();
+                    return View("../" + profile_path[userModel.profile] + "/Index", userModel.p_user);
                 }
                 else if (userModel.profile == 1)
                 {
-                    fb = new adminController();
+                    return View("../" + profile_path[userModel.profile] + "/Index", userModel.a_user);
                 }
-                else fb = new doctorsController();
-                return View("../"+profile_path[userModel.profile]+"/Index", userModel);
+                else return View("../" + profile_path[userModel.profile] + "/Index", userModel.d_user);
+             
             }
             else
             {

@@ -2,6 +2,7 @@
 using FirebaseConnector.Controllers;
 using FirebaseConnector.Models;
 using System.Threading.Tasks;
+using Google.Cloud.Firestore;
 
 namespace WebApplication1.Services
 {
@@ -22,7 +23,7 @@ namespace WebApplication1.Services
             knownAdmins = await fb.getCredentials("admins");
             knownDoctors = await fb.getCredentials("doctors");
         }
-        public bool IsValid(UserModel user)
+        public async Task<bool> IsValid(UserModel user)
         {
             bool valid = false;
             List<Dictionary<string, string>> ProfileGroups = new List<Dictionary<string, string>>();
@@ -33,6 +34,8 @@ namespace WebApplication1.Services
             Console.WriteLine(user.profile.ToString());
             try
             {
+                FireBaseController fb = new FireBaseController();
+                await user.buildUser();
                 string key = ProfileGroups[user.profile][user.UserName];
                 if (key != null && SHA256Hasher.ComputeHash(user.Password).Equals(key)) valid = true;
             }

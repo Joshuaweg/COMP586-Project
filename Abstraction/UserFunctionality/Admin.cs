@@ -2,126 +2,56 @@ using System;
 using System.Collections.Generic; 
 using Npgsql;
 using System.Data;
+using FirebaseConnector.Controllers;
+using FirebaseConnector.Models;
+using Google.Cloud.Firestore;
 
-class Admin : AdminInterface {
-    public string name;
+public class Admin : AdminInterface {
+    public string name { get; set; }
+    public string supp { get; set; }
+    public string doctor { get; set; }
+    public string patient { get; set; }
+    public string quantity { get; set; }
+    public string bill { get; set; }
     public Admin(string name) {
         this.name = name.ToLower();
     }
+    public Admin() {
+        this.name = "";
+    }
 
     public override async Task orderSupplies() {
-        Console.WriteLine("\nEnter the name of the product: ");
-        string supplyName = Console.ReadLine().ToLower();
-        Console.WriteLine("\nEnter the amount to order (lbs) (just the number): ");
-        string supplyAmount = Console.ReadLine();
-
-        int preExistingAmount = 0; 
-        bool found = false;
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From orderedsupples";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if(((string)reader[1]).ToLower() == supplyName.ToLower()) {
-                    found = true;
-                    preExistingAmount = Int32.Parse((string)reader[2]);
-                    int temp = Int32.Parse(supplyAmount);
-                    int tempAmount = temp + preExistingAmount;
-                    supplyAmount = tempAmount.ToString();
-                    break;
-                }
-            }
-            con.Close();
-        }
-        if(!found) {
-            using(NpgsqlConnection con = base.GetConnection()) {    
-                string query = $"insert into orderedsupples(name,amount)values('{supplyName}','{supplyAmount}')";
-                NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-                con.Open();
-                int n = cmd.ExecuteNonQuery();
-                if(n==1) {
-                    Console.WriteLine("\nSupply Ordered");
-                }
-                con.Close();
-            }
-        } else {
-            using(NpgsqlConnection con = base.GetConnection()) {    
-                string query = $"UPDATE orderedsupples SET amount = {supplyAmount} where name = '{supplyName}'";
-                NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-                con.Open();
-                int n = cmd.ExecuteNonQuery();
-                if(n==1) {
-                    Console.WriteLine("\nSupply Ordered");
-                }
-                con.Close();
-            }
-        }
+        ordersupplies os = new ordersupplies();
+        ordersuppliesController osc = new ordersuppliesController();
+        os.name = supp;
+        os.amount = Convert.ToInt32(quantity);
+        await osc.addDocumentAsync(os, supp + quantity);
+        supp = null;
+        quantity = "";
+        
     }
 
     public override async Task manageDoctors() {
-        Console.WriteLine("\nEnter the name of the Doctor you want to fire: ");
-        string firedDoctor = Console.ReadLine().ToLower();
-        using(NpgsqlConnection con = base.GetConnection()) {    
-            string query = $"DELETE FROM doctors WHERE name = '{firedDoctor}'";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            int n = cmd.ExecuteNonQuery();
-            if(n==1) {
-                Console.WriteLine("\nDoctor Fired");
+        doctorsController dc = new doctorsController();
+        string doc_id = "";
+        QuerySnapshot qs = await dc.Query("doctors", new Dictionary<string, object>() { { "name", this.doctor } });
+        foreach (DocumentSnapshot doc in qs.Documents) {
+            doc_id = doc.Id;
+            Dictionary<string, object> fields = doc.ToDictionary();
+            if (fields["name"].ToString().Equals(doctor)) {
+                await dc.deleteDocumentAsync(doc_id);
             }
-            con.Close();
         }
+        doctor = null;
     }
 
     public override async Task billCustomer() {
-        Console.WriteLine("\nEnter the name of the patient to bill: ");
-        string patientName = Console.ReadLine().ToLower();
-        Console.WriteLine("\nEnter the amount to charge (just the number): ");
-        string patientCharge = Console.ReadLine();
-
-        int preExistingCharge = 0; 
-        bool found = false;
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From patientbills";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if(((string)reader[1]).ToLower() == patientName.ToLower()) {
-                    found = true;
-                    preExistingCharge = Int32.Parse((string)reader[2]);
-                    int temp = Int32.Parse(patientCharge);
-                    int tempAmount = temp + preExistingCharge;
-                    patientCharge = tempAmount.ToString();
-                    break;
-                }
-            }
-            con.Close();
-        }
-        if(!found) {
-            using(NpgsqlConnection con = base.GetConnection()) {    
-                string query = $"insert into patientbills(patient,amount)values('{patientName}','{patientCharge}')";
-                NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-                con.Open();
-                int n = cmd.ExecuteNonQuery();
-                if(n==1) {
-                    Console.WriteLine("\nPatient Charged");
-                }
-                con.Close();
-            }
-        } else {
-            using(NpgsqlConnection con = base.GetConnection()) {    
-                string query = $"UPDATE patientbills SET amount = {patientCharge} where patient = '{patientName}'";
-                NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-                con.Open();
-                int n = cmd.ExecuteNonQuery();
-                if(n==1) {
-                    Console.WriteLine("\nPatient Charged");
-                }
-                con.Close();
-            }
-        }
+        patientbillsController pbc = new patientbillsController();
+        patientbills pb = new patientbills();
+        pb.patient = patient;
+        pb.amount = Convert.ToInt32(bill);
+        
+        await pbc.addDocumentAsync(pb, patient + bill);
     }
 
     public async Task readComments() {

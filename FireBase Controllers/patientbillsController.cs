@@ -17,7 +17,7 @@ namespace FirebaseConnector.Controllers
             Dictionary<string, object> patient = new Dictionary<string, object>();
             if (record.ID != null) patient.Add("ID", record.ID);
             if (record.patient != null) patient.Add("patient", record.patient);
-            if (record.amount != null) patient.Add("amouont", record.amount);
+            if (record.amount != null) patient.Add("amount", record.amount);
             await docRef.SetAsync(patient, SetOptions.MergeAll);
 
         }

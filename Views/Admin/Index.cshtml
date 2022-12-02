@@ -1,8 +1,61 @@
 ﻿@{
-    ViewData["Title"] = "Admin";
+    @model Admin;
+    ViewData["Title"] = "Admin-"+ViewData.Model.name;
 }
 
 <div class="text-center">
-    <h1 class="display-4">Admin</h1>
+    <h1 class="display-4">
+        @ViewData.Model.name.ToString()
+    </h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+    <form asp-controller="Admin" asp-action="fireDoctor">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="doctor" class="control-label"></label>
+            <input asp-for="doctor"  class="form-control" type="text" />
+            <span asp-validation-for="doctor" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Remove Doctor" class="btn btn-primary" />
+        </div>
+    </form>
+    <br /><br /><br />
+    <form asp-controller="Admin" asp-action="billPatient">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="patient" class="control-label"></label>
+            <input asp-for="patient" class="form-control" type="text" />
+            <span asp-validation-for="patient" class="text-danger"></span>
+        </div>
+         <div class="form-group">
+            <label asp-for="bill" class="control-label"></label>
+            <input asp-for="bill" class="form-control" type="text" />
+            <span asp-validation-for="bill" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Bill Patient" class="btn btn-primary" />
+        </div>
+    </form>
+    <form asp-controller="Admin" asp-action="order">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="supp" class="control-label"></label>
+            <input asp-for="supp" class="form-control" type="text" />
+            <span asp-validation-for="supp" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="quantity" class="control-label"></label>
+            <input asp-for="quantity" class="form-control" type="text" />
+            <span asp-validation-for="quantity" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Order Supplies" class="btn btn-primary" />
+        </div>
+    </form>
+
 </div>

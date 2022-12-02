@@ -2,27 +2,21 @@ using System;
 using System.Collections.Generic; 
 using Npgsql;
 using System.Data;
+using FirebaseConnector.Controllers;
+using Google.Cloud.Firestore;
 
-class Patient : PatientInterface{
+public class Patient : PatientInterface{
     public string name;
     public Patient(string name) {
         this.name = name.ToLower();
     }
+    public Patient() {
+        this.name = "";
+    }
 
     public override void viewPrescriptions() {
-        Console.WriteLine("\nList of Prescriptions: ");
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From patientprescriptions";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if(((string)reader[1]).ToLower() == name) {
-                    Console.WriteLine(reader[2]);
-                }
-            }
-            con.Close();
-        }
+        patientprescriptionsController pc = new patientprescriptionsController();
+
     }
 
     public override void modifyAppointment() {

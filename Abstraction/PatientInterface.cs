@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Npgsql;
 using System.Data;
 
-abstract class PatientInterface {
+public abstract class PatientInterface {
     public abstract void viewPrescriptions();
     public abstract void modifyAppointment();
     public abstract void viewAppointment();

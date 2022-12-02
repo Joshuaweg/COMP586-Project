@@ -4,26 +4,46 @@ using System.Data;
 using FirebaseConnector.Controllers;
 using FirebaseConnector.Models;
 using Google.Cloud.Firestore;
+using Microsoft.AspNetCore.Mvc;
+using WebApplication1.Models;
 
 public class Doctor : DoctorInterface, ChatHandler {
-    public string name;
-    public Doctor(string name) {
+    public string name { get; set; }
+    public string patientName { get; set; }
+    public string prescriptionName { get; set; }
+    public object payload { get; set; }
+
+    public Doctor(string name)
+    {
         this.name = name.ToLower();
+    }
+    public Doctor()
+    {
+        this.name = "";
     }
 
     public override async Task givePrescriptions() {
-        Console.WriteLine("\nEnter the name of the patient: ");
-        string patientName = Console.ReadLine();
-        Console.WriteLine("\nEnter the prescription: ");
-        string prescriptionName = Console.ReadLine();
         patientprescriptions prescribe = new patientprescriptions();
         patientprescriptionsController pc = new patientprescriptionsController();
+        Console.WriteLine(this.patientName);
+        Console.WriteLine(this.prescriptionName);
+        prescribe.patient = this.patientName;
+        prescribe.presciptions = this.prescriptionName;
+        await pc.addDocumentAsync(prescribe, patientName + prescriptionName);
+    }
+    public async Task givePrescriptions(UserModel user)
+    {
+        patientprescriptions prescribe = new patientprescriptions();
+        patientprescriptionsController pc = new patientprescriptionsController();
+        Console.WriteLine(user.d_user.patientName);
+        Console.WriteLine(user.d_user.prescriptionName);
         prescribe.patient = patientName;
         prescribe.presciptions = prescriptionName;
         await pc.addDocumentAsync(prescribe, patientName + prescriptionName);
 
     }
-    
+
+
     public override async Task<List<Dictionary<string,object>>> viewAppointments() {
         Console.WriteLine("\nList of Appointments: ");
         List<Dictionary<string, object>> apointmentList = new List<Dictionary<string,object>>();
@@ -46,12 +66,11 @@ public class Doctor : DoctorInterface, ChatHandler {
         List<Dictionary<string,object>> PatientList = new List<Dictionary<string ,object>>();
         bool found = false;
         Dictionary<string, object> fields = new Dictionary<string, object>();
-        string patientName = Console.ReadLine();
         fields.Add("patient", patientName);
         fields.Add("doctor", name);
         patientsController pc = new patientsController();
 
-        QuerySnapshot qu = await pc.Query("doctorinchargeofpatients", fields);
+        QuerySnapshot qu = await pc.Query("doctorinchargeofpatient", fields);
 
         if (qu != null)
         {

@@ -1,8 +1,63 @@
 ﻿@{
-    ViewData["Title"] = "Doctor";
+@model Doctor
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+    @using WebApplication1.Controllers;
+    Doctor doc = ViewData.Model;
+    if(doc!=null){
+    ViewData["Title"] = "Doctor-" +doc.name.ToString();
+    }
+    DoctorController dc = new DoctorController();
+    string schedule = await dc.ViewSchedule(doc);
+
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+    <h1 class="display-4">
+        @ViewData.Model.name.ToString()
+        </h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+       <section>
+        @Html.Raw(schedule);
+    </section>
+    <form asp-controller="Doctor" asp-action="orderPrescription">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="patientName" class="control-label"></label>
+            <input asp-for="patientName" name="patientName" class="form-control" type="text" />
+            <span asp-validation-for="patientName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="prescriptionName" class="control-label"></label>
+            <input name="prescriptionName" asp-for="prescriptionName" class="form-control" type="text" />
+            <span asp-validation-for="prescriptionName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input name="name" asp-for="name" class="form-control" value=@doc.name type="hidden" />
+            <span asp-validation-for="name" class="text-danger" ></span>
+        </div>
+       
+        <div class="form-group">
+            <input type="submit" value="Order Prescriptons" class="btn btn-primary" />
+        </div>
+    </form>
+    <br /><br /><br />
+    <form asp-controller="Doctor" asp-action="patientInfo">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="patientName" class="control-label"></label>
+            <input asp-for="patientName" name="patientName" class="form-control" type="text" />
+            <span asp-validation-for="patientName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input name="name" asp-for="name" class="form-control" value=@doc.name type="hidden" />
+            <span asp-validation-for="name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="View Patient" class="btn btn-primary" />
+        </div>
+    </form>
+
 </div>
