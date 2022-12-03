@@ -32,7 +32,7 @@ namespace WebApplication1.Models
                     qu = await fb.Query("patients", new Dictionary<string, object>(){ { "username",UserName} });
                     foreach (var res in qu) {
                         Dictionary<string, object> data = res.ToDictionary();
-                        nm = data["patients"].ToString();
+                        nm = data["patient"].ToString();
                         break;
                     }
                     p_user = new Patient(nm);

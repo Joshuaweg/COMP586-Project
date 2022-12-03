@@ -10,13 +10,14 @@ namespace FirebaseConnector.Controllers
 {
     internal class doctortoadmincommentsController:FireBaseController
     {
-        public async Task addDocumentAsync(doctortoadmincomments record, string doc)
+        public async Task addDocumentAsync(doctortoadmincomments record)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("doctortoadmincomments").Document(doc);
-            object[] param = new object[] { record.admin, record.doctor, record.ID, record.message };
+            record.id = await createId("doctortoadmincomments");
+            DocumentReference docRef = connect.Collection("doctortoadmincomments").Document(record.id.ToString()+record.doctor+record.admin+"docadcomm");
+            object[] param = new object[] { record.admin, record.doctor, record.id, record.message };
             Dictionary<string, object> doctor = new Dictionary<string, object>();
-            if (record.ID != null) doctor.Add("ID", record.ID);
+            if (record.id != null) doctor.Add("ID", record.id);
             if (record.doctor != null) doctor.Add("doctor", record.doctor);
             if (record.admin != null) doctor.Add("admin", record.admin);
             if (record.message != null) doctor.Add("message", record.message);
@@ -48,13 +49,12 @@ namespace FirebaseConnector.Controllers
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
             }
         }
-        public async Task updateDocumentAsync(string documentid, doctortoadmincomments record)
+        public async Task updateDocumentAsync(doctortoadmincomments record)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("doctortoadmincomments").Document(documentid);
-            object[] param = new object[] { record.admin, record.doctor, record.ID, record.message };
+            QuerySnapshot qs = await this.Query("doctortoadmincomments", new Dictionary<string, object>() { { "id", record.id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            DocumentReference docRef = doc.Reference;
             Dictionary<string, object> doctor = new Dictionary<string, object>();
-            if (record.ID != null) doctor.Add("ID", record.ID);
             if (record.doctor != null) doctor.Add("doctor", record.doctor);
             if (record.admin != null) doctor.Add("admin", record.admin);
             if (record.message != null) doctor.Add("message", record.message);

@@ -10,12 +10,14 @@ namespace FirebaseConnector.Controllers
 {
     internal class doctorsController:FireBaseController
     {
-        public async Task addDocumentAsync(doctors record, string doc)
+        public async Task addDocumentAsync(doctors record)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("doctors").Document(doc);
+            record.id = await createId("doctors");
+            DocumentReference docRef = connect.Collection("doctors").Document(record.id.ToString()+record.name+"doc");
             object[] param = new object[] { record.name, record.username, record.password };
             Dictionary<string, object> doctor = new Dictionary<string, object>();
+            doctor.Add("id", record.id);
             if (record.name != null) doctor.Add("name", record.name);
             if (record.username != null) doctor.Add("username", record.username);
             if (record.password != null) doctor.Add("password", SHA256Hasher.ComputeHash(record.password));
@@ -47,11 +49,11 @@ namespace FirebaseConnector.Controllers
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
             }
         }
-        public async Task updateDocumentAsync(string documentid, doctors record)
+        public async Task updateDocumentAsync(doctors record)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("doctors").Document(documentid);
-            object[] param = new object[] { record.name, record.username, record.password };
+            QuerySnapshot qs = await this.Query("doctors", new Dictionary<string, object>() { { "id", record.id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            DocumentReference docRef = doc.Reference;
             Dictionary<string, object> doctor = new Dictionary<string, object>();
             if (record.name != null) doctor.Add("name", record.name);
             if (record.username != null) doctor.Add("username", record.username);

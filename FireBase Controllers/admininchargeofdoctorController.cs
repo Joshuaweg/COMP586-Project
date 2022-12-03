@@ -12,15 +12,16 @@ namespace FirebaseConnector.Controllers
 {
     internal class admininchargeofdoctorController:FireBaseController
     {
-        public async Task addDocumentAsync(admininchargeofdoctor record,string doc)
+        public async Task addDocumentAsync(admininchargeofdoctor record)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("admininchargeofdoctor").Document(doc);
-            object[] param = new object[] { record.admin, record.doctor, record.ID };
+            record.id = await createId("admins");
+            DocumentReference docRef = connect.Collection("admininchargeofdoctor").Document(record.id.ToString()+record.admin+record.ToString()+"addoc");
+            object[] param = new object[] { record.admin, record.doctor, record.id };
             Dictionary<string, object> admin = new Dictionary<string, object>();
             if (record.admin != null) admin.Add("admin", record.admin);
             if (record.doctor != null) admin.Add("doctor", record.doctor);
-            admin.Add("ID", record.ID);
+            admin.Add("id", record.id);
             await docRef.SetAsync(admin, SetOptions.MergeAll);
 
         }
@@ -49,15 +50,15 @@ namespace FirebaseConnector.Controllers
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
             }
         }
-        public async Task updateDocumentAsync(string documentid, admininchargeofdoctor record)
+        public async Task updateDocumentAsync(admininchargeofdoctor record)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("admininchargerofdoctor").Document(documentid);
-            object [] param = new object[] {record.admin,record.doctor,record.ID };
+            QuerySnapshot qs = await this.Query("admininchargeofdoctors", new Dictionary<string, object>() { { "id", record.id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            DocumentReference docRef = doc.Reference;
             Dictionary<string, object> admin = new Dictionary<string, object>();
             if(record.admin != null)admin.Add("admin",record.admin);
             if(record.doctor != null) admin.Add("doctor", record.doctor);
-            admin.Add("ID", record.ID);
+           
             
 
             await docRef.UpdateAsync(admin);

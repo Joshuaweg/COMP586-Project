@@ -2,11 +2,23 @@ using System;
 using System.Collections.Generic; 
 using Npgsql;
 using System.Data;
+using FirebaseConnector.Models;
 using FirebaseConnector.Controllers;
 using Google.Cloud.Firestore;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 
 public class Patient : PatientInterface{
-    public string name;
+    public string name { get; set; }
+    public Options o_sel { get; set; }
+    public string address { get; set; }
+    public string phone { get; set; }
+    public enum Options { 
+          Add,
+          Delete
+    }
+    public DateTime appointment { get; set; }
+    public int sched_id { get; set; }
+    public int bill_id { get; set; }
     public Patient(string name) {
         this.name = name.ToLower();
     }
@@ -14,128 +26,64 @@ public class Patient : PatientInterface{
         this.name = "";
     }
 
-    public override void viewPrescriptions() {
+    public override async Task<List<Dictionary<string,object>>> viewPrescriptions() {
+        List<Dictionary<string,object>> result = new List<Dictionary<string,object>>();
         patientprescriptionsController pc = new patientprescriptionsController();
+        QuerySnapshot qs = await pc.Query("patientprescriptions", new Dictionary<string, object>() { { "name", this.name } });
+        foreach (DocumentSnapshot doc in qs.Documents) {
+            result.Append(doc.ToDictionary());
+        }
+
+        return result;
 
     }
 
-    public override void modifyAppointment() {
-        Console.WriteLine("Input how you would like to modify the appointment (delete or add): ");
-        string option = Console.ReadLine().ToLower();
-        if(option == "delete") {
-            Console.WriteLine("Enter the appointment title you would like to delete: ");
-            string deleteAppointment = Console.ReadLine().ToLower();
-            using(NpgsqlConnection con = base.GetConnection()) {    
-                string query = $"DELETE FROM patientappointments WHERE title = '{deleteAppointment}' AND patient = '{name}'";
-                NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-                con.Open();
-                int n = cmd.ExecuteNonQuery();
-                if(n==1) {
-                    Console.WriteLine("\nAppointment Deleted");
-                }
-                con.Close();
-            }
-        } else if(option == "add") {
-            Console.WriteLine("\nEnter the title of the appointment: ");
-            string title = Console.ReadLine();
-            Console.WriteLine("\nEnter the time for the appointment: ");
-            string time = Console.ReadLine();
-            Console.WriteLine("\nEnter the date for the appointment: ");
-            string date = Console.ReadLine();
-            using(NpgsqlConnection con = base.GetConnection()) {    
-                string query = $"insert into patientappointments(patient,time,date,title)values('{name.ToLower()}','{time.ToLower()}','{date.ToLower()}','{title.ToLower()}')";
-                NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-                con.Open();
-                int n = cmd.ExecuteNonQuery();
-                if(n==1) {
-                    Console.WriteLine("\nAppointment Made");
-                }
-                con.Close();
-            }
-        }
+    public override async Task modifyAppointment() {
+        
+        return;
     }
 
-    public override void viewAppointment() {
-        Console.WriteLine("\nList of Appointments: ");
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From patientappointments";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if(((string)reader[1]).ToLower() == name) {
-                    Console.WriteLine(reader[4] + ": " + reader[2] + " " + reader[3]);
-                }
-            }
-            con.Close();
-        }
+
+    public override async Task<List<Dictionary<string, object>>> viewAppointment()
+    {
+        FireBaseController fb = new FireBaseController();
+        List<Dictionary<string, object>> results = await fb.getQuery("patientappointments", new List<string>() { "id", "patient", "time" });
+        return results;
+    }
+    public async Task<List<Dictionary<string, object>>> viewBills()
+    {
+        FireBaseController fb = new FireBaseController();
+        List<Dictionary<string, object>> results = await fb.getQuery("patientbills", new List<string>() { "id", "patient", "amount" });
+        return results;
     }
 
-    public override void payBill() {
-        using(NpgsqlConnection con = base.GetConnection()) {    
-            string query = $"DELETE FROM patientbills WHERE patient = '{name}'";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            int n = cmd.ExecuteNonQuery();
-            if(n==1) {
-                Console.WriteLine("\nBill Paid");
-            }
-            con.Close();
-        }
+    public override async Task payBill() {
+        patientbillsController pbc = new patientbillsController();
+        await pbc.deleteDocumentAsync(this.bill_id);
     }
 
-    public override void updateInformation() {
-        Console.WriteLine("\nPlease Provide The Name Of Your Primary Doctor");
-        string currentDoctor = Console.ReadLine().ToLower();
-        Console.WriteLine("\nPlease Provide Your Address");
-        string address = Console.ReadLine().ToLower();
-        Console.WriteLine("\nPlease Provide Your Phone Number");
-        string phoneNumber = Console.ReadLine();
-        Console.WriteLine("\nPlease Provide Your Insurance Provider");
-        string insurance = Console.ReadLine().ToLower();
-        using(NpgsqlConnection con = base.GetConnection()) {    
-            string query = $"UPDATE patients SET currentdoctor = '{currentDoctor}', address = '{address}', phonenumber = '{phoneNumber}', insuranceprovider = '{insurance}' WHERE name = '{name}'";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            int n = cmd.ExecuteNonQuery();
-            if(n==1) {
-                Console.WriteLine("\nPatient Updated");
-            }
-            con.Close();
+    public override async Task updateInformation() {
+        patientsController pc = new patientsController();
+        patients pa = new patients();
+        Console.WriteLine(this.name);
+        QuerySnapshot qs = await pc.Query("patients", new Dictionary<string, object>() { { "patient", this.name } });
+        if (qs.Documents.Count()>0) {
+            DocumentSnapshot doc = qs.Documents[0];
+            Dictionary<string, object> result = doc.ToDictionary();
+            pa.id = Convert.ToInt32(result["id"]);
+            pa.phonenumber = this.phone;
+            pa.address = this.address;
+            await pc.updateDocumentAsync(pa);
         }
+        
     }
 
-    public void readComments() {
-        Console.WriteLine("\nList of Comments: ");
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From doctortopatientcomments";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if(((string)reader[2]).ToLower() == name) {
-                    Console.WriteLine(reader[1] + ": " + reader[3]);
-                }
-            }
-            con.Close();
-        }
+    public async Task readComments() {
+        return;
     }
 
-    public void writeComments() {
-        Console.WriteLine("\nEnter the name of the doctor to message: ");
-        string doctorName = Console.ReadLine();
-        Console.WriteLine("\nEnter the message to send: ");
-        string message = Console.ReadLine();
-        using(NpgsqlConnection con = base.GetConnection()) {    
-            string query = $"insert into patienttodoctorcomments(patient,doctor,message)values('{name.ToLower()}','{doctorName.ToLower()}','{message}')";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            int n = cmd.ExecuteNonQuery();
-            if(n==1) {
-                Console.WriteLine("\nMessage Sent");
-            }
-            con.Close();
-        }
+    public async Task writeComments() {
+        return;
     }
 
     //Create/Cancel Appointment X

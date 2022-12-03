@@ -8,7 +8,7 @@ namespace FirebaseConnector.Models
 {
     internal class doctorschedules
     {
-        public int ID { get; set; }
+        public int id { get; set; }
         public string doctor { get; set; }
         public string patient { get; set; }
         public DateTime time { get; set; }

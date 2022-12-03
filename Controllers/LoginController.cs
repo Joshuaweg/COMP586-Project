@@ -22,7 +22,7 @@ namespace WebApplication1.Controllers
             await securityService.fill();
             if(await securityService.IsValid(userModel) )
             {
-                FireBaseController fb;
+                
                 if (userModel.profile == 0)
                 {
                     return View("../" + profile_path[userModel.profile] + "/Index", userModel.p_user);

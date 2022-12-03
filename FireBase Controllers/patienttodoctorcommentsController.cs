@@ -10,13 +10,14 @@ namespace FirebaseConnector.Controllers
 {
     internal class patienttodoctorcommentsController:FireBaseController
     {
-        public async Task addDocumentAsync(doctortopatientcomments record, string doc)
+        public async Task addDocumentAsync(patienttodoctorcomments record, string doc)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("doctortopatientcomments").Document(doc);
-            object[] param = new object[] { record.patient, record.doctor, record.ID, record.message };
+            record.id = await createId("patienttodoctorcomments");
+            DocumentReference docRef = connect.Collection("doctortopatientcomments").Document(record.id.ToString()+record.patient+record.doctor+"patdoccomm");
+            object[] param = new object[] { record.patient, record.doctor, record.id, record.message };
             Dictionary<string, object> doctor = new Dictionary<string, object>();
-            if (record.ID != null) doctor.Add("ID", record.ID);
+            if (record.id != null) doctor.Add("id", record.id);
             if (record.doctor != null) doctor.Add("doctor", record.doctor);
             if (record.patient != null) doctor.Add("admin", record.patient);
             if (record.message != null) doctor.Add("message", record.message);
@@ -52,9 +53,7 @@ namespace FirebaseConnector.Controllers
         {
             FirestoreDb connect = createConnection();
             DocumentReference docRef = connect.Collection("doctortopatientcomments").Document(documentid);
-            object[] param = new object[] { record.patient, record.doctor, record.ID, record.message };
             Dictionary<string, object> doctor = new Dictionary<string, object>();
-            if (record.ID != null) doctor.Add("ID", record.ID);
             if (record.doctor != null) doctor.Add("doctor", record.doctor);
             if (record.patient != null) doctor.Add("admin", record.patient);
             if (record.message != null) doctor.Add("message", record.message);

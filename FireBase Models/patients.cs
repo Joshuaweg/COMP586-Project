@@ -11,7 +11,7 @@ namespace FirebaseConnector.Models
 {
      public class patients : FireBaseController
     {
-        public int ID { get; set; }
+        public int id { get; set; }
         public string patient { get; set; }
         public string currentdoctor { get; set; }
         public DateTime dateofbirth { get; set; }

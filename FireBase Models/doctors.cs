@@ -8,8 +8,9 @@ namespace FirebaseConnector.Models
 {
     internal class doctors
     {
-        public string name;
-        public string username;
-        public string password;
+        public int id { get; set; }
+        public string name { get; set; }
+        public string username { get; set; }
+        public string password { get; set; }
     }
 }

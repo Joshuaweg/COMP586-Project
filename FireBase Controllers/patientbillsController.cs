@@ -13,19 +13,24 @@ namespace FirebaseConnector.Controllers
         public async Task addDocumentAsync(patientbills record, string doc)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("patientbills").Document(doc);
+            record.id = await createId("patientbills");
+            DocumentReference docRef = connect.Collection("patientbills").Document(record.id.ToString()+record.patient+record.amount.ToString()+"bills");
             Dictionary<string, object> patient = new Dictionary<string, object>();
-            if (record.ID != null) patient.Add("ID", record.ID);
+            if (record.id != null) patient.Add("id", record.id);
             if (record.patient != null) patient.Add("patient", record.patient);
             if (record.amount != null) patient.Add("amount", record.amount);
             await docRef.SetAsync(patient, SetOptions.MergeAll);
 
         }
-        public async Task deleteDocumentAsync(string documentid)
+        public async Task deleteDocumentAsync(int id)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference cityRef = connect.Collection("patientbills").Document(documentid);
-            await cityRef.DeleteAsync();
+            QuerySnapshot qs = await this.Query("patientbills", new Dictionary<string, object>() { { "id", id } });
+            if (qs.Documents != null)
+            {
+                DocumentSnapshot doc = qs.Documents[0];
+                DocumentReference docRef = doc.Reference;
+                await docRef.DeleteAsync();
+            }
         }
         public async Task retrieveDocumentAsync(string documentid)
         {
@@ -46,12 +51,12 @@ namespace FirebaseConnector.Controllers
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
             }
         }
-        public async Task updateDocumentAsync(string documentid, patientbills record)
+        public async Task updateDocumentAsync(patientbills record)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("patientbills").Document(documentid);
+            QuerySnapshot qs = await this.Query("patientbills", new Dictionary<string, object>() { { "id", record.id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            DocumentReference docRef = doc.Reference;
             Dictionary<string, object> patient = new Dictionary<string, object>();
-            if (record.ID != null) patient.Add("ID", record.ID);
             if (record.patient != null) patient.Add("patient", record.patient);
             if (record.amount != null) patient.Add("amouont", record.amount);
 

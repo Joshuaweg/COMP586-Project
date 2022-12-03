@@ -1,8 +1,113 @@
 ﻿@{
+    @model Patient;
+    @using WebApplication1.Controllers;
     ViewData["Title"] = "Patient";
+    Patient pat = new Patient(ViewData.Model.name.ToString());
+    PatientController pc = new PatientController();
+    DateTime dt = DateTime.Now;
+    string today = dt.ToString("f");
+    string sched = await pc.viewSchedule(pat);
+    List<Dictionary<int,string>>schedulefields = await pc.getSchedule(pat);
+    List<Dictionary<int,int>> bills = await pc.getBills(pat);
+    List<int> s_ids=new List<int>();
+    List<string> s_times=new List<string>();
+    List<SelectList> dd_ids = new List<SelectList>();
+    foreach (var s in schedulefields) {
+        s_ids.Add((int)s.Keys.First());
+        s_times.Add((string)s.Values.First());
+    }
+   
 }
-
+<style>
+    
+</style>
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">
+        @ViewData.Model.name.ToString()
+    </h1>
+    
+
+
+
+    <h3>Schedule Manager</h3>
+    <form asp-controller="Patient" asp-action="updateSchedule">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="table-4">
+
+            @Html.Raw(sched)
+
+        </div>
+
+        <div class="form-group">
+            <label asp-for="o_sel" class="control-label"></label>
+            <select asp-for="o_sel" asp-items="@Html.GetEnumSelectList<Patient.Options>()">
+                <option selected="selected" value="@Patient.Options.Add">Please select</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="appointment" class="control-label"></label>
+            <input asp-for="appointment" textmode="Date" value="@today"/>
+        </div>
+        <div class="form-group">
+            <input asp-for="name" type="hidden" value="@ViewData.Model.name.ToString()" />
+        </div>
+        <div class="form-group">
+            <label asp-for="sched_id" class="control-label"></label>
+            <input asp-for="sched_id" type="text"/>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Update Schedule" class="btn btn-primary" />
+        </div>
+    </form>
+    <h3>Bills </h3>
+    @foreach (var bil in bills){
+    <form asp-controller="Patient" asp-action="pay">
+        <p>
+        $@bil.Values.First()
+        </p>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <input type ="hidden" asp-for="bill_id" value=@bil.Keys.First()/>
+            <input type="submit" value="Pay Bill" class="btn btn-primary" />
+        </div>
+    </form>
+    }
+    <h3>Update Contact</h3>
+    <form asp-controller="Patient" asp-action="updateContact">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="phone" class="control-label"></label>
+            <input asp-for="phone" type="text" />
+        </div>
+        <div class="form-group">
+            <input asp-for="name" type="hidden" value="@ViewData.Model.name.ToString()" />
+        </div>
+        <div class="form-group">
+            <label asp-for="address" class="control-label"></label>
+            <input asp-for="address" type="text"/>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Update Contact Information" class="btn btn-primary" />
+        </div>
+    </form>
 </div>
+<script>
+    $('#target').change(function() {
+      var name = $('#target option:selected'),text(); //Item1
+      var id = $('#target').val(); // option2
+
+      if(id =="option2"){
+       //your logic for this option
+       //hide textbox
+       $('.textboxclass').hide();
+       $('.someform').show();
+       }else{
+       $('.textboxclass').show();
+       $('.someform').hide();
+
+    }
+       //other if else logic
+
+    });
+</script>
+

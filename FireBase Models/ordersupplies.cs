@@ -8,7 +8,7 @@ namespace FirebaseConnector.Models
 {
     internal class ordersupplies
     {
-        public int ID { get; set; }
+        public int id { get; set; }
         public string name { get; set; }
         public int amount { get; set; }
 

@@ -8,7 +8,7 @@ namespace FirebaseConnector.Models
 {
     internal class admininchargeofdoctor
     {
-        public int ID { get; set; }
+        public int id { get; set; }
         public string admin { get; set; }
         public string doctor { get; set; }
     }

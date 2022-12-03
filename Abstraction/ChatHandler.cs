@@ -1,4 +1,4 @@
 interface ChatHandler {
-    Task<List<Dictionary<string,object>>> readComments();
+    Task readComments();
     Task writeComments(string recepient, string message);
 }

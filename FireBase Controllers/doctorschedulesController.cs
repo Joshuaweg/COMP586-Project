@@ -10,13 +10,14 @@ namespace FirebaseConnector.Controllers
 {
     internal class doctorschedulesController:FireBaseController
     {
-        public async Task addDocumentAsync(doctorschedules record, string doc)
+        public async Task addDocumentAsync(doctorschedules record)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("doctorSchedules").Document(doc);
-            object[] param = new object[] { record.patient, record.doctor, record.ID, record.time };
+            record.id = await createId("doctorschedules");
+            DocumentReference docRef = connect.Collection("doctorSchedules").Document(record.id.ToString()+record.doctor+record.patient+"Sched");
+            object[] param = new object[] { record.patient, record.doctor, record.id, record.time };
             Dictionary<string, object> doctor = new Dictionary<string, object>();
-            if (record.ID != null) doctor.Add("ID", record.ID);
+            if (record.id != null) doctor.Add("ID", record.id);
             if (record.doctor != null) doctor.Add("doctor", record.doctor);
             if (record.patient != null) doctor.Add("patient", record.patient);
             if (record.time != null) doctor.Add("time", record.time);
@@ -49,13 +50,12 @@ namespace FirebaseConnector.Controllers
             }
         }
         
-        public async Task updateDocumentAsync(string documentid, doctorschedules record)
+        public async Task updateDocumentAsync(doctorschedules record)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("doctorSchedules").Document(documentid);
-            object[] param = new object[] { record.patient, record.doctor, record.ID, record.time };
+            QuerySnapshot qs = await this.Query("doctorschedules", new Dictionary<string, object>() { { "id", record.id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            DocumentReference docRef = doc.Reference;
             Dictionary<string, object> doctor = new Dictionary<string, object>();
-            if (record.ID != null) doctor.Add("ID", record.ID);
             if (record.doctor != null) doctor.Add("doctor", record.doctor);
             if (record.patient != null) doctor.Add("patient", record.patient);
             if (record.time != null) doctor.Add("time", record.time);

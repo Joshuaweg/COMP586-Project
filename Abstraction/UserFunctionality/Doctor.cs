@@ -7,7 +7,7 @@ using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 
-public class Doctor : DoctorInterface, ChatHandler {
+public class Doctor : DoctorInterface{
     public string name { get; set; }
     public string patientName { get; set; }
     public string prescriptionName { get; set; }
@@ -29,7 +29,7 @@ public class Doctor : DoctorInterface, ChatHandler {
         Console.WriteLine(this.prescriptionName);
         prescribe.patient = this.patientName;
         prescribe.presciptions = this.prescriptionName;
-        await pc.addDocumentAsync(prescribe, patientName + prescriptionName);
+        await pc.addDocumentAsync(prescribe);
     }
     public async Task givePrescriptions(UserModel user)
     {
@@ -39,7 +39,7 @@ public class Doctor : DoctorInterface, ChatHandler {
         Console.WriteLine(user.d_user.prescriptionName);
         prescribe.patient = patientName;
         prescribe.presciptions = prescriptionName;
-        await pc.addDocumentAsync(prescribe, patientName + prescriptionName);
+        await pc.addDocumentAsync(prescribe);
 
     }
 
@@ -153,7 +153,7 @@ public class Doctor : DoctorInterface, ChatHandler {
             dca.admin = recepient;
             dca.doctor = name;
             dca.message = message;
-            await ac.addDocumentAsync(dca, name + "to" + recepient);
+            await ac.addDocumentAsync(dca);
             found = true;
         }
         if (!found) Console.WriteLine("Not found");

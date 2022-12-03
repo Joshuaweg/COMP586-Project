@@ -10,23 +10,28 @@ namespace FirebaseConnector.Controllers
 {
     internal class patientappointmentsController:FireBaseController
     {
-        public async Task addDocumentAsync(patientappointments record, string doc)
+        public async Task addDocumentAsync(patientappointments record)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("patientappointments").Document(doc);
+            record.id = await createId("patientappointments");
+            DocumentReference docRef = connect.Collection("patientappointments").Document(record.id.ToString()+record.patient+"schedule");
             Dictionary<string, object> patient = new Dictionary<string, object>();
-            if (record.ID != null) patient.Add("ID", record.ID);
+            if (record.id != null) patient.Add("id", record.id);
             if (record.patient!= null) patient.Add("patient", record.patient);
             if (record.name != null) patient.Add("name", record.name);
             if (record.time != null) patient.Add("time", record.time);
             await docRef.SetAsync(patient, SetOptions.MergeAll);
 
         }
-        public async Task deleteDocumentAsync(string documentid)
+        public async Task deleteDocumentAsync(int id)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference cityRef = connect.Collection("patientappointments").Document(documentid);
-            await cityRef.DeleteAsync();
+            QuerySnapshot qs = await this.Query("patientappointments", new Dictionary<string, object>() { { "id", id } });
+            if (qs != null)
+            {
+                DocumentSnapshot doc = qs.Documents[0];
+                DocumentReference docRef = doc.Reference;
+                await docRef.DeleteAsync();
+            }
         }
         public async Task retrieveDocumentAsync(string documentid)
         {
@@ -49,10 +54,10 @@ namespace FirebaseConnector.Controllers
         }
         public async Task updateDocumentAsync(string documentid, patientappointments record)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("patientappointments").Document(documentid);
+            QuerySnapshot qs = await this.Query("patientappointments", new Dictionary<string, object>() { { "id", record.id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            DocumentReference docRef = doc.Reference;
             Dictionary<string, object> patient = new Dictionary<string, object>();
-            if (record.ID != null) patient.Add("ID", record.ID);
             if (record.patient != null) patient.Add("patient", record.patient);
             if (record.name != null) patient.Add("name", record.name);
             if (record.time != null) patient.Add("time", record.time);

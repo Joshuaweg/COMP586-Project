@@ -12,11 +12,13 @@ namespace FirebaseConnector.Controllers
 {
     internal class patientsController:FireBaseController
     {
-        public async Task addDocumentAsync(patients record,string doc)
+        public async Task addDocumentAsync(patients record)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("patients").Document(doc);
+            record.id = await createId("patients");
+            DocumentReference docRef = connect.Collection("patients").Document(record.id.ToString()+record.patient+"pat");
             Dictionary<string, object> patient = new Dictionary<string, object>();
+            patient.Add("id", record.id);
             if (record.patient != null) patient.Add("patient", record.patient);
             if (record.address != null) patient.Add("address", record.address);
             if (record.currentdoctor != null) patient.Add("currentdoctor", record.currentdoctor);
@@ -52,11 +54,11 @@ namespace FirebaseConnector.Controllers
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
             }
         }
-        public async Task updateDocumentAsync(string documentid, patients record)
+        public async Task updateDocumentAsync(patients record)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("patients").Document(documentid);
-            object [] param = new object[] {record.patient,record.currentdoctor,record.address,record.dateofbirth,record.phonenumber,record.username,record.password };
+            QuerySnapshot qs = await this.Query("patients", new Dictionary<string, object>() { { "id", record.id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            DocumentReference docRef = doc.Reference;
             Dictionary<string, object> patient = new Dictionary<string, object>();
             if(record.patient != null)patient.Add("patient",record.patient);
             if(record.address != null) patient.Add("address", record.address);

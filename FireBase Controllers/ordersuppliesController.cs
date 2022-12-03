@@ -13,10 +13,11 @@ namespace FirebaseConnector.Controllers
         public async Task addDocumentAsync(ordersupplies record, string doc)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("ordersupplies").Document(doc);
-            object[] param = new object[] { record.name, record.amount, record.ID };
+            record.id = await createId("ordersupplies");
+            DocumentReference docRef = connect.Collection("ordersupplies").Document(record.id.ToString()+record.name+record.amount.ToString()+"supplies");
+            object[] param = new object[] { record.name, record.amount, record.id };
             Dictionary<string, object> order = new Dictionary<string, object>();
-            if (record.ID != null) order.Add("ID", record.ID);
+            if (record.id != null) order.Add("ID", record.id);
             if (record.name != null) order.Add("name", record.name);
             if (record.amount != null) order.Add("amount", record.amount);
             await docRef.SetAsync(order, SetOptions.MergeAll);
@@ -47,15 +48,14 @@ namespace FirebaseConnector.Controllers
                 Console.WriteLine("Document {0} does not exist!", snapshot.Id);
             }
         }
-        public async Task updateDocumentAsync(string documentid, ordersupplies record)
+        public async Task updateDocumentAsync(ordersupplies record)
         {
-            FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("ordersupplies").Document(documentid);
-            object[] param = new object[] { record.name, record.amount, record.ID };
+            QuerySnapshot qs = await this.Query("ordersupplies", new Dictionary<string, object>() { { "id", record.id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            DocumentReference docRef = doc.Reference;
             Dictionary<string, object> order = new Dictionary<string, object>();
-            if (record.ID != null) order.Add("ID", record.ID);
             if (record.name != null) order.Add("name", record.name);
-            if (record.amount != null) order.Add("amount", record.amount);
+            if (record.amount != 0) order.Add("amount", record.amount);
             
 
             await docRef.UpdateAsync(order);

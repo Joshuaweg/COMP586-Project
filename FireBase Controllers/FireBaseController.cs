@@ -29,20 +29,49 @@ namespace FirebaseConnector.Controllers
             }
             return creds;
         }
+        public async Task <List<Dictionary<string, object>>> getQuery(string collect, List<string> cols)
+        {
+            FirestoreDb db = createConnection();
+            Query collection = db.Collection(collect);
+            List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
+            QuerySnapshot collectionSnapshot = await collection.GetSnapshotAsync();
+            foreach (DocumentSnapshot documentSnapshot in collectionSnapshot.Documents)
+            {
+                Dictionary<string, object> record = new Dictionary<string, object>();
+                Dictionary<string, object> document = documentSnapshot.ToDictionary();
+                foreach (string col in cols)
+                {
+                    record.Add(col, document[col]);
+                }
+                results.Add(record);
+            }
+            return results;
+        }
         public async Task<QuerySnapshot> Query(string collect,Dictionary<string,object> fields)
         {
             FirestoreDb db = createConnection();
             CollectionReference collectRef = db.Collection(collect);
             Query query = collectRef;
             foreach (string key in fields.Keys) {
-                query = query.WhereEqualTo(key, fields[key].ToString());
+                query = query.WhereEqualTo(key,fields[key]);
             } 
             QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
-            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
-            {
-                Console.WriteLine("Document {0} returned by query Capital=true", documentSnapshot.Id);
-            }
+           
             return querySnapshot;
+        }
+        public static async Task<int> createId(string collect) {
+            int id = 0;
+            FirestoreDb db = createConnection();
+            CollectionReference collectRef = db.Collection(collect);
+            Query query = collectRef.OrderByDescending("id");
+            QuerySnapshot qs = await query.GetSnapshotAsync();
+            IReadOnlyList<DocumentSnapshot>  docs = qs.Documents;
+            Dictionary<string,object> doc = docs[0].ToDictionary();
+            id = Convert.ToInt32(doc["id"]) + 1;
+            return id;
+        
+        
+        
         }
 
     }
