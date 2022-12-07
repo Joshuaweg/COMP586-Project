@@ -14,11 +14,18 @@ namespace FirebaseConnector.Controllers
         {
             FirestoreDb connect = createConnection();
             record.id = await createId("doctorschedules");
-            DocumentReference docRef = connect.Collection("doctorSchedules").Document(record.id.ToString()+record.doctor+record.patient+"Sched");
+            DocumentReference docRef = connect.Collection("doctorschedules").Document(record.id.ToString()+record.doctor+record.patient+"Sched");
             object[] param = new object[] { record.patient, record.doctor, record.id, record.time };
             Dictionary<string, object> doctor = new Dictionary<string, object>();
-            if (record.id != null) doctor.Add("ID", record.id);
-            if (record.doctor != null) doctor.Add("doctor", record.doctor);
+            doctor.Add("id", record.id);
+            doctor.Add("doctor_id", record.doctor_id);
+            doctor.Add("patient_id", record.patient_id);
+            QuerySnapshot qs = await this.Query("doctors", new Dictionary<string, object>() { { "id", record.doctor_id } });
+            DocumentSnapshot doc = qs.Documents[0];
+            Dictionary<string, object> map = doc.ToDictionary();
+            Console.WriteLine(map["name"].ToString());
+            record.doctor = map["name"].ToString();
+            doctor.Add("doctor", record.doctor);
             if (record.patient != null) doctor.Add("patient", record.patient);
             if (record.time != null) doctor.Add("time", record.time);
             await docRef.SetAsync(doctor, SetOptions.MergeAll);
@@ -27,7 +34,7 @@ namespace FirebaseConnector.Controllers
         public async Task deleteDocumentAsync(string documentid)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference cityRef = connect.Collection("doctorSchedules").Document(documentid);
+            DocumentReference cityRef = connect.Collection("doctorschedules").Document(documentid);
             await cityRef.DeleteAsync();
         }
         public async Task retrieveDocumentAsync(string documentid)

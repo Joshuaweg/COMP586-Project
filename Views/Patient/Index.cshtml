@@ -1,21 +1,21 @@
 ﻿@{
     @model Patient;
     @using WebApplication1.Controllers;
-    ViewData["Title"] = "Patient";
+    @using Google.Cloud.Firestore;
+    @using FirebaseConnector.Controllers
+    ViewData["Title"] = "Patient-"+ViewData.Model.name.ToString();
+    FireBaseController fb = new FireBaseController();
+    List<Dictionary<string,object>> doctors=await fb.getQuery("doctors", new List<string>() { "id", "name" });
     Patient pat = new Patient(ViewData.Model.name.ToString());
+    pat.id = ViewData.Model.id;
     PatientController pc = new PatientController();
     DateTime dt = DateTime.Now;
     string today = dt.ToString("f");
     string sched = await pc.viewSchedule(pat);
     List<Dictionary<int,string>>schedulefields = await pc.getSchedule(pat);
     List<Dictionary<int,int>> bills = await pc.getBills(pat);
-    List<int> s_ids=new List<int>();
-    List<string> s_times=new List<string>();
-    List<SelectList> dd_ids = new List<SelectList>();
-    foreach (var s in schedulefields) {
-        s_ids.Add((int)s.Keys.First());
-        s_times.Add((string)s.Values.First());
-    }
+
+   
    
 }
 <style>
@@ -49,11 +49,25 @@
             <input asp-for="appointment" textmode="Date" value="@today"/>
         </div>
         <div class="form-group">
-            <input asp-for="name" type="hidden" value="@ViewData.Model.name.ToString()" />
+            
+            <select asp-for="doctor_id"  >
+            @foreach(Dictionary<string,object> doc in doctors){
+             <option value=@doc["id"]>@doc["name"]</option>
+            }
+            </select>
+        </div>
+        <div class="form-group">
+            <input asp-for="id" type="hidden" value="@ViewData.Model.id" />
+            <input asp-for="name" type="hidden" value="@ViewData.Model.name" />
         </div>
         <div class="form-group">
             <label asp-for="sched_id" class="control-label"></label>
-            <input asp-for="sched_id" type="text"/>
+            <select asp-for="sched_id">
+                @foreach (Dictionary<int,string> sch in schedulefields)
+                {
+                    <option value=@sch.Keys.First()>@sch[sch.Keys.First()].ToString()</option>
+                }
+            </select>
         </div>
         <div class="form-group">
             <input type="submit" value="Update Schedule" class="btn btn-primary" />
@@ -70,6 +84,10 @@
             <input type ="hidden" asp-for="bill_id" value=@bil.Keys.First()/>
             <input type="submit" value="Pay Bill" class="btn btn-primary" />
         </div>
+            <div class="form-group">
+                <input asp-for="id" type="hidden" value="@ViewData.Model.id" />
+                <input asp-for="name" type="hidden" value="@ViewData.Model.name" />
+            </div>
     </form>
     }
     <h3>Update Contact</h3>
@@ -80,6 +98,7 @@
             <input asp-for="phone" type="text" />
         </div>
         <div class="form-group">
+            <input asp-for="id" type="hidden" value="@ViewData.Model.id" />
             <input asp-for="name" type="hidden" value="@ViewData.Model.name.ToString()" />
         </div>
         <div class="form-group">
@@ -91,23 +110,10 @@
         </div>
     </form>
 </div>
-<script>
-    $('#target').change(function() {
-      var name = $('#target option:selected'),text(); //Item1
-      var id = $('#target').val(); // option2
-
-      if(id =="option2"){
-       //your logic for this option
-       //hide textbox
-       $('.textboxclass').hide();
-       $('.someform').show();
-       }else{
-       $('.textboxclass').show();
-       $('.someform').hide();
+    <style>
+        form{
+        background-color:palevioletred;
 
     }
-       //other if else logic
-
-    });
-</script>
+    </style>
 

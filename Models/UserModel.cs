@@ -25,6 +25,7 @@ namespace WebApplication1.Models
             FireBaseController fb = new FireBaseController();
             QuerySnapshot qu;
             string nm = "";
+            int id = 0;
             switch (profile)
             {
 
@@ -33,9 +34,12 @@ namespace WebApplication1.Models
                     foreach (var res in qu) {
                         Dictionary<string, object> data = res.ToDictionary();
                         nm = data["patient"].ToString();
+                        id = Convert.ToInt32(data["id"]);
                         break;
                     }
                     p_user = new Patient(nm);
+                    Console.WriteLine(id.ToString());
+                    p_user.id = id;
                     break;
                 case 1:
                      qu = await fb.Query("admins", new Dictionary<string, object>() { { "username", UserName } });
@@ -43,9 +47,11 @@ namespace WebApplication1.Models
                     {
                         Dictionary<string, object> data = res.ToDictionary();
                         nm = data["name"].ToString();
+                        id = Convert.ToInt32(data["id"]);
                         break;
                     }
                     a_user = new Admin(nm);
+                    a_user.id = id;
                     break;
                 case 2:
                     qu = await fb.Query("doctors", new Dictionary<string, object>() { { "username", UserName } });
@@ -53,9 +59,11 @@ namespace WebApplication1.Models
                     {
                         Dictionary<string, object> data = res.ToDictionary();
                         nm = data["name"].ToString();
+                        id = Convert.ToInt32(data["id"]);
                         break;
                     }
                     d_user = new Doctor(nm);
+                    d_user.id = id;
                     Console.WriteLine(  d_user.name);
                     break;
             }

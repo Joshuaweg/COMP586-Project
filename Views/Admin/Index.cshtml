@@ -1,20 +1,32 @@
 ﻿@{
     @model Admin;
+    @using Google.Cloud.Firestore;
+    @using FirebaseConnector.Controllers;
     ViewData["Title"] = "Admin-"+ViewData.Model.name;
+    List<Dictionary<string, object>> pats = new List<Dictionary<string, object>>();
+    FireBaseController fb = new FireBaseController();
+    List<Dictionary<string,object>> patients = await fb.getQuery("patients",new List<string>(){"id","patient"});
+    List<Dictionary<string, object>> doctors= await fb.getQuery("doctors", new List<string>() { "id", "name" });
+    
 }
 
 <div class="text-center">
     <h1 class="display-4">
         @ViewData.Model.name.ToString()
     </h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
     
+    <h3>Manage Doctors</h3>
     <form asp-controller="Admin" asp-action="fireDoctor">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
             <label asp-for="doctor" class="control-label"></label>
-            <input asp-for="doctor"  class="form-control" type="text" />
+            <select asp-for="patient">
+                @foreach (Dictionary<string, object> doc in doctors)
+                {
+                    <option value=@doc["name"]>@doc["name"]</option>
+                }
+            </select>
             <span asp-validation-for="doctor" class="text-danger"></span>
         </div>
 
@@ -23,12 +35,18 @@
         </div>
     </form>
     <br /><br /><br />
+    <h3>Bill Patients for Services</h3>
     <form asp-controller="Admin" asp-action="billPatient">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
             <label asp-for="patient" class="control-label"></label>
-            <input asp-for="patient" class="form-control" type="text" />
+            <select asp-for="patient">
+                @foreach (Dictionary<string, object> pat in patients)
+                {
+                    <option value=@pat["patient"]>@pat["patient"]</option>
+                }
+            </select>
             <span asp-validation-for="patient" class="text-danger"></span>
         </div>
          <div class="form-group">
@@ -40,6 +58,7 @@
             <input type="submit" value="Bill Patient" class="btn btn-primary" />
         </div>
     </form>
+    <h3>Order Equipment and Supplies</h3>
     <form asp-controller="Admin" asp-action="order">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -59,3 +78,9 @@
     </form>
 
 </div>
+<style>
+    form{
+      background-color:coral;
+    
+    }
+</style>

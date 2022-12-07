@@ -1,10 +1,22 @@
 ﻿@{
-@model Doctor
+    @using FirebaseConnector.Controllers;
+    @using Google.Cloud.Firestore;
+    @using FirebaseConnector.Models;
+    @model Doctor
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
     @using WebApplication1.Controllers;
     Doctor doc = ViewData.Model;
     if(doc!=null){
-    ViewData["Title"] = "Doctor-" +doc.name.ToString();
+        ViewData["Title"] = "Doctor-" + doc.name.ToString();
+    }
+    List<Dictionary<string, object>> pats = new List<Dictionary<string, object>>();
+    FireBaseController fb = new FireBaseController();
+    QuerySnapshot qs = await fb.Query("doctorinchargeofpatient", new Dictionary<string, object> { { "doctor_id", ViewData.Model.id } });
+    foreach (var dos in qs.Documents) {
+        Console.WriteLine(dos.Id.ToString());
+        Dictionary<string, object> info = dos.ToDictionary();
+        pats.Add(info);
+
     }
     DoctorController dc = new DoctorController();
     string schedule = await dc.ViewSchedule(doc);
@@ -15,17 +27,20 @@
     <h1 class="display-4">
         @ViewData.Model.name.ToString()
         </h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
        <section>
-        @Html.Raw(schedule);
+        @Html.Raw(schedule)
     </section>
+    <h3>Order Prescriptions for Patients</h3>
     <form asp-controller="Doctor" asp-action="orderPrescription">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group">
-            <label asp-for="patientName" class="control-label"></label>
-            <input asp-for="patientName" name="patientName" class="form-control" type="text" />
-            <span asp-validation-for="patientName" class="text-danger"></span>
+       <div class="form-group">
+        <select asp-for="patientName">
+            @foreach (Dictionary<string, object> pa in pats)
+            {
+                <option value=@pa["patient"]>@pa["patient"]</option>
+            }
+        </select>
         </div>
         <div class="form-group">
             <label asp-for="prescriptionName" class="control-label"></label>
@@ -33,7 +48,8 @@
             <span asp-validation-for="prescriptionName" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <input name="name" asp-for="name" class="form-control" value=@doc.name type="hidden" />
+            <input asp-for="id" class="form-control" value=@doc.id type="hidden" />
+            <input asp-for="name" class="form-control" value=@doc.name.ToString() type="hidden" />
             <span asp-validation-for="name" class="text-danger" ></span>
         </div>
        
@@ -42,16 +58,21 @@
         </div>
     </form>
     <br /><br /><br />
+    <h3>Lookup Patient</h3>
     <form asp-controller="Doctor" asp-action="patientInfo">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
-            <label asp-for="patientName" class="control-label"></label>
-            <input asp-for="patientName" name="patientName" class="form-control" type="text" />
-            <span asp-validation-for="patientName" class="text-danger"></span>
+        <select asp-for="patientName">
+            @foreach (Dictionary<string, object> pa in pats)
+            {
+                <option value=@pa["patient"]>@pa["patient"]</option>
+            }
+        </select>
         </div>
         <div class="form-group">
-            <input name="name" asp-for="name" class="form-control" value=@doc.name type="hidden" />
+            <input asp-for="id" class="form-control" value=@doc.id type="hidden" />
+            <input asp-for="name" class="form-control" value=@doc.name.ToString() type="hidden" />
             <span asp-validation-for="name" class="text-danger"></span>
         </div>
 
@@ -61,3 +82,8 @@
     </form>
 
 </div>
+<style>
+    form {
+        background-color: cyan;
+    }
+</style>

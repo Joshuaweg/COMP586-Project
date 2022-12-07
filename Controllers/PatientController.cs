@@ -16,9 +16,9 @@ namespace WebApplication1.Controllers
 
         // GET: PatientController/Details/5
         public async Task<string> viewSchedule(Patient pat) {
-            string sched = "<table><tr><th>ID</th><th>name</th><th>patient</th><th>Time</th></tr>\n";
+            string sched = "<table><caption>Upcoming Appoinments</caption><tr><th>ID</th><th>name</th><th>patient</th><th>Time</th></tr>\n";
             patientappointmentsController pa = new patientappointmentsController();
-            QuerySnapshot qs = await pa.Query("patientappointments", new Dictionary<string, object>() { { "patient", pat.name } });
+            QuerySnapshot qs = await pa.Query("patientappointments", new Dictionary<string, object>() { { "patient_id", pat.id } });
             foreach (DocumentSnapshot doc in qs.Documents) {
                 Dictionary<string, object> data = doc.ToDictionary();
                 Timestamp ts = (Timestamp)data["time"];
@@ -59,18 +59,43 @@ namespace WebApplication1.Controllers
 
         public async Task<IActionResult> updateSchedule(Patient pat) {
             patientappointmentsController pac = new patientappointmentsController();
+            doctorschedulesController dsc = new doctorschedulesController();
             switch (pat.o_sel) {
 
                 case Patient.Options.Add:
                     patientappointments pa = new patientappointments();
+                    doctorschedules ds = new doctorschedules();
+                    ds.doctor_id = pat.doctor_id;
+                    ds.time = pat.appointment.ToUniversalTime();
+                    ds.patient = pat.name;
+                    ds.patient_id = pat.id;
                     pa.patient = pat.name;
+                    pa.patient_id = pat.id;
+                    pa.doctor_id = pat.doctor_id;
                     pa.name = pat.name;
                     pa.time = pat.appointment.ToUniversalTime();
                     await pac.addDocumentAsync(pa);
+                    await dsc.addDocumentAsync(ds);
+                    Console.WriteLine("Both tables updated");
+
                     break;
                 case Patient.Options.Delete:
+                    Timestamp ts = new Timestamp();
+
                     Console.WriteLine(pat.sched_id.ToString());
+                    QuerySnapshot pqs = await pac.Query("patientappointments", new Dictionary<string, object>() { { "id", pat.sched_id } });
+                    foreach (var doc in pqs.Documents) {
+                        Dictionary<string, object> dict = doc.ToDictionary();
+                        ts = (Timestamp)dict["time"];
+                    }
+                    Console.WriteLine("Timestamp from schedule: "+ts.ToString());
                     await pac.deleteDocumentAsync(pat.sched_id);
+                    QuerySnapshot qs = await dsc.Query("doctorschedules", new Dictionary<string, object>() { { "doctor_id", pat.doctor_id }, { "patient_id", pat.id }, { "time", ts } });
+                    foreach (var doc in qs.Documents) {
+                        Console.WriteLine(doc.Id);
+                        await dsc.deleteDocumentAsync(doc.Id);
+                    }
+                    Console.WriteLine("both tables had records removed");
                     break;
             
             

@@ -8,6 +8,8 @@ using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 
 public class Patient : PatientInterface{
+    public int id { get; set; }
+    public int doctor_id { get; set; }
     public string name { get; set; }
     public Options o_sel { get; set; }
     public string address { get; set; }

@@ -7,6 +7,7 @@ using FirebaseConnector.Models;
 using Google.Cloud.Firestore;
 
 public class Admin : AdminInterface {
+    public int id { get; set; }
     public string name { get; set; }
     public string supp { get; set; }
     public string doctor { get; set; }

@@ -53,6 +53,8 @@ namespace FirebaseConnector.Controllers
             CollectionReference collectRef = db.Collection(collect);
             Query query = collectRef;
             foreach (string key in fields.Keys) {
+                Console.WriteLine(key);
+                Console.WriteLine(fields[key]);
                 query = query.WhereEqualTo(key,fields[key]);
             } 
             QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
@@ -66,8 +68,14 @@ namespace FirebaseConnector.Controllers
             Query query = collectRef.OrderByDescending("id");
             QuerySnapshot qs = await query.GetSnapshotAsync();
             IReadOnlyList<DocumentSnapshot>  docs = qs.Documents;
-            Dictionary<string,object> doc = docs[0].ToDictionary();
-            id = Convert.ToInt32(doc["id"]) + 1;
+            if (docs.Count > 0)
+            {
+                Dictionary<string, object> doc = docs[0].ToDictionary();
+                id = Convert.ToInt32(doc["id"]) + 1;
+            }
+            else {
+                id = 1;
+            }
             return id;
         
         

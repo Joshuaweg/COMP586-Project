@@ -9,6 +9,8 @@ using WebApplication1.Models;
 
 public class Doctor : DoctorInterface{
     public string name { get; set; }
+    public int id { get; set; }
+    public int patientId { get; set; }
     public string patientName { get; set; }
     public string prescriptionName { get; set; }
     public object payload { get; set; }
@@ -49,7 +51,7 @@ public class Doctor : DoctorInterface{
         List<Dictionary<string, object>> apointmentList = new List<Dictionary<string,object>>();
         doctorschedulesController docsched = new doctorschedulesController();
         Dictionary<string, object> qu = new Dictionary<string, object>();
-        qu.Add("doctor", name);
+        qu.Add("doctor_id", this.id);
         QuerySnapshot appointments= await docsched.Query("doctorschedules", qu);
         foreach (var appointment in appointments.Documents) {
             Dictionary<string, object> appt = appointment.ToDictionary();
@@ -66,8 +68,8 @@ public class Doctor : DoctorInterface{
         List<Dictionary<string,object>> PatientList = new List<Dictionary<string ,object>>();
         bool found = false;
         Dictionary<string, object> fields = new Dictionary<string, object>();
-        fields.Add("patient", patientName);
-        fields.Add("doctor", name);
+        fields.Add("patient", this.patientName);
+        fields.Add("doctor", this.name);
         patientsController pc = new patientsController();
 
         QuerySnapshot qu = await pc.Query("doctorinchargeofpatient", fields);

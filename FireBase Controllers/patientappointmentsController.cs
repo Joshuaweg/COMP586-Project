@@ -16,7 +16,9 @@ namespace FirebaseConnector.Controllers
             record.id = await createId("patientappointments");
             DocumentReference docRef = connect.Collection("patientappointments").Document(record.id.ToString()+record.patient+"schedule");
             Dictionary<string, object> patient = new Dictionary<string, object>();
-            if (record.id != null) patient.Add("id", record.id);
+            patient.Add("id", record.id);
+            patient.Add("patient_id", record.patient_id);
+            patient.Add("doctor_id", record.doctor_id);
             if (record.patient!= null) patient.Add("patient", record.patient);
             if (record.name != null) patient.Add("name", record.name);
             if (record.time != null) patient.Add("time", record.time);

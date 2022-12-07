@@ -8,6 +8,12 @@
     List<Dictionary<string,object>> res = (List<Dictionary<string,object>>)result;
 
 }
+<form class="Back" asp-controller="Doctor" asp-action="Back">
+    <input type="submit" value="Back" />
+    <input asp-for ="name" input type="hidden" value="@ViewData.Model.name" />
+    <input asp-for="id" input type="hidden" value="@ViewData.Model.id" />
+
+</form>
 <div class="text-center">
     <h1 class="display-4">
         @ViewData.Model.name.ToString()

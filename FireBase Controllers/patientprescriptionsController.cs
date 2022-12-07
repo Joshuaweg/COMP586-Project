@@ -13,7 +13,7 @@ namespace FirebaseConnector.Controllers
         public async Task addDocumentAsync(patientprescriptions record)
         {
             FirestoreDb connect = createConnection();
-            record.id = await createId("patientpresciptions");
+            record.id = await createId("patientprescriptions");
             DocumentReference docRef = connect.Collection("patientprescriptions").Document(record.id.ToString()+record.patient+record.presciptions+"prescribe");
             Dictionary<string, object> patient = new Dictionary<string, object>();
             if (record.id != null) patient.Add("id", record.id);
