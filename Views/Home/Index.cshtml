@@ -1,12 +1,15 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<form class="login" asp-controller="Login" asp-action="Index">
+<form class="btn-lg" asp-controller="Login" asp-action="Index">
       <input type="submit" value="Login"/>
+</form>
+<form class="btn-lg" asp-controller="Signup" asp-action="Index">
+    <input type="submit" value="Patient Signup" />
 </form>
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
 </div>
 <style>
     .login{

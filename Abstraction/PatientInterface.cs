@@ -5,7 +5,6 @@ using System.Data;
 
 public abstract class PatientInterface {
     public abstract Task viewPrescriptions();
-    public abstract Task modifyAppointment();
     public abstract Task viewAppointment();
     public abstract Task payBill();
     public abstract Task updateInformation();

@@ -13,10 +13,14 @@ namespace WebApplication1.Controllers
         {
             return View();
         }
+        public ActionResult Back(Patient pat)
+        {
+            return View("Index",pat);
+        }
 
         // GET: PatientController/Details/5
         public async Task<string> viewSchedule(Patient pat) {
-            string sched = "<table><caption>Upcoming Appoinments</caption><tr><th>ID</th><th>name</th><th>patient</th><th>Time</th></tr>\n";
+            string sched = "<table class=\"table\"><tr><th>ID</th><th>name</th><th>patient</th><th>Time</th></tr>\n";
             patientappointmentsController pa = new patientappointmentsController();
             QuerySnapshot qs = await pa.Query("patientappointments", new Dictionary<string, object>() { { "patient_id", pat.id } });
             foreach (DocumentSnapshot doc in qs.Documents) {
@@ -35,8 +39,12 @@ namespace WebApplication1.Controllers
                 Dictionary<int, string> sch = new Dictionary<int, string>();
                 Timestamp ts = (Timestamp)appt["time"];
                 string time = ts.ToDateTime().ToString("f");
-                sch.Add((int)Convert.ToInt32(appt["id"]), time);
-                schs.Add(sch);
+                if (appt["patient"].Equals(pat.name))
+                {
+                    sch.Add((int)Convert.ToInt32(appt["id"]), time);
+                    schs.Add(sch);
+                }
+                
             
             }
 
@@ -49,8 +57,11 @@ namespace WebApplication1.Controllers
             foreach (Dictionary<string, object> bil in bill)
             {
                 Dictionary<int, int> bl = new Dictionary<int, int>();
-                bl.Add((int)Convert.ToInt32(bil["id"]), Convert.ToInt32(bil["amount"]));
-                bills.Add(bl);
+                if (bil["patient"].Equals(pat.name))
+                {
+                    bl.Add((int)Convert.ToInt32(bil["id"]), Convert.ToInt32(bil["amount"]));
+                    bills.Add(bl);
+                }
 
             }
 
@@ -116,6 +127,15 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> updateContact(Patient pat) {
             await pat.updateInformation();
             return View("Index", pat); 
+        }
+        public async Task<IActionResult> viewPrescriptions(Patient pat) {
+            pat.payload = await pat.viewPrescriptions();
+            List<Dictionary<string, object>> res = (List<Dictionary<string, object>>)pat.payload;
+            Console.WriteLine(res.Count);
+            foreach (var pres in (List<Dictionary<string,object>>)pat.payload) {
+                Console.WriteLine(pres["prescriptions"]);
+            }
+            return View("Medications", pat);
         }
     }
 }

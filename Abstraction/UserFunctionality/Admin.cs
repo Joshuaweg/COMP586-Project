@@ -8,6 +8,7 @@ using Google.Cloud.Firestore;
 
 public class Admin : AdminInterface {
     public int id { get; set; }
+    public object payload { get; set; }
     public string name { get; set; }
     public string supp { get; set; }
     public string doctor { get; set; }
@@ -30,6 +31,13 @@ public class Admin : AdminInterface {
         supp = null;
         quantity = "";
         
+    }
+    public async Task<List<Dictionary<string,object>>> getSupplies()
+    {
+        ordersupplies os = new ordersupplies();
+        ordersuppliesController osc = new ordersuppliesController();
+        List<Dictionary<string,object>> orders = await osc.getQuery("ordersupplies", new List<string>() { "name","amount" });
+        return orders;
     }
 
     public override async Task manageDoctors() {
@@ -55,41 +63,8 @@ public class Admin : AdminInterface {
         await pbc.addDocumentAsync(pb, patient + bill);
     }
 
-    public async Task readComments() {
-        Console.WriteLine("\nList of Comments: ");
-        using(NpgsqlConnection con = base.GetConnection()) {
-            string query = $"Select * From doctortoadmincomments";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            NpgsqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                if(((string)reader[2]).ToLower() == name) {
-                    Console.WriteLine(reader[1] + ": " + reader[3]);
-                }
-            }
-            con.Close();
-        }
-    }
+    
 
-    public async Task writeComments() {
-        Console.WriteLine("\nEnter the name of the doctor to message: ");
-        string doctorName = Console.ReadLine();
-        Console.WriteLine("\nEnter the message to send: ");
-        string message = Console.ReadLine();
-        using(NpgsqlConnection con = base.GetConnection()) {    
-            string query = $"insert into admintodoctorcomments(admin,doctor,message)values('{name.ToLower()}','{doctorName.ToLower()}','{message}')";
-            NpgsqlCommand cmd = new NpgsqlCommand(query, con);
-            con.Open();
-            int n = cmd.ExecuteNonQuery();
-            if(n==1) {
-                Console.WriteLine("\nMessage Sent");
-            }
-            con.Close();
-        }
-    }
-    //Order supplies X
-    //Manage doctors (fire them?) X
+   
 
-    //read/make comments to doctor X
-    //read/make comments to admin X
 }

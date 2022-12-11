@@ -6,9 +6,11 @@ using FirebaseConnector.Models;
 using FirebaseConnector.Controllers;
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using Microsoft.AspNetCore.Mvc;
 
 public class Patient : PatientInterface{
     public int id { get; set; }
+    public object payload { get; set; }
     public int doctor_id { get; set; }
     public string name { get; set; }
     public Options o_sel { get; set; }
@@ -28,21 +30,18 @@ public class Patient : PatientInterface{
         this.name = "";
     }
 
-    public override async Task<List<Dictionary<string,object>>> viewPrescriptions() {
+    public override async Task<List<Dictionary<string, object>>> viewPrescriptions() {
         List<Dictionary<string,object>> result = new List<Dictionary<string,object>>();
         patientprescriptionsController pc = new patientprescriptionsController();
-        QuerySnapshot qs = await pc.Query("patientprescriptions", new Dictionary<string, object>() { { "name", this.name } });
+        QuerySnapshot qs = await pc.Query("patientprescriptions", new Dictionary<string, object>() { { "patient", this.name } },"time");
+        Console.WriteLine(this.name);
+        Console.WriteLine(qs.Documents.Count);
         foreach (DocumentSnapshot doc in qs.Documents) {
-            result.Append(doc.ToDictionary());
+            result.Add(doc.ToDictionary());
+            Console.WriteLine(doc.ToDictionary()["prescriptions"]);
         }
-
         return result;
 
-    }
-
-    public override async Task modifyAppointment() {
-        
-        return;
     }
 
 

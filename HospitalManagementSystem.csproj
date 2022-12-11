@@ -12,4 +12,15 @@
     <PackageReference Include="Npgsql" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Signup\Index.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Patient\Medications.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

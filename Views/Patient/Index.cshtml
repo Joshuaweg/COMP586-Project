@@ -18,9 +18,7 @@
    
    
 }
-<style>
-    
-</style>
+
 <div class="text-center">
     <h1 class="display-4">
         @ViewData.Model.name.ToString()
@@ -30,27 +28,23 @@
 
 
     <h3>Schedule Manager</h3>
+   
     <form asp-controller="Patient" asp-action="updateSchedule">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="table-4">
-
-            @Html.Raw(sched)
-
-        </div>
 
         <div class="form-group">
-            <label asp-for="o_sel" class="control-label"></label>
-            <select asp-for="o_sel" asp-items="@Html.GetEnumSelectList<Patient.Options>()">
-                <option selected="selected" value="@Patient.Options.Add">Please select</option>
+            <label class="control-label">Add or Delete Appointment</label>
+            <select class="form-select" asp-for="o_sel" asp-items="@Html.GetEnumSelectList<Patient.Options>()">
+                <option selected="selected" >Please Select</option>
             </select>
         </div>
-        <div class="form-group">
-            <label asp-for="appointment" class="control-label"></label>
-            <input asp-for="appointment" textmode="Date" value="@today"/>
+        <div class="form-group add">
+            <label  class="control-label">Add:Appointment</label>
+            <input class="form-text" asp-for="appointment" textmode="Date" value="@today" />
         </div>
         <div class="form-group">
-            
-            <select asp-for="doctor_id"  >
+            <label class="control-label">Add:Doctor</label>
+            <select asp-for="doctor_id" class="form-select" >
             @foreach(Dictionary<string,object> doc in doctors){
              <option value=@doc["id"]>@doc["name"]</option>
             }
@@ -61,12 +55,16 @@
             <input asp-for="name" type="hidden" value="@ViewData.Model.name" />
         </div>
         <div class="form-group">
-            <label asp-for="sched_id" class="control-label"></label>
-            <select asp-for="sched_id">
-                @foreach (Dictionary<int,string> sch in schedulefields)
-                {
-                    <option value=@sch.Keys.First()>@sch[sch.Keys.First()].ToString()</option>
+            <label class="control-label">Delete:Scheduled Appointment </label>
+            <select asp-for="sched_id" class="form-select">
+                <option >Please Select</option>
+                @if(schedulefields.Count>0){
+                    @foreach (Dictionary<int, string> sch in schedulefields)
+                    {
+                        <option value=@sch.Keys.First()>@sch[sch.Keys.First()].ToString()</option>
+                    }
                 }
+        
             </select>
         </div>
         <div class="form-group">
@@ -74,28 +72,36 @@
         </div>
     </form>
     <h3>Bills </h3>
-    @foreach (var bil in bills){
-    <form asp-controller="Patient" asp-action="pay">
-        <p>
-        $@bil.Values.First()
-        </p>
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group">
-            <input type ="hidden" asp-for="bill_id" value=@bil.Keys.First()/>
-            <input type="submit" value="Pay Bill" class="btn btn-primary" />
-        </div>
-            <div class="form-group">
-                <input asp-for="id" type="hidden" value="@ViewData.Model.id" />
-                <input asp-for="name" type="hidden" value="@ViewData.Model.name" />
-            </div>
-    </form>
+    @if (bills.Count > 0)
+    {
+        @foreach (var bil in bills)
+        {
+            <form asp-controller="Patient" asp-action="pay">
+                <p>
+                    $@bil.Values.First()
+                </p>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <input type ="hidden" asp-for="bill_id" value=@bil.Keys.First()/>
+                    <input type="submit" value="Pay Bill" class="btn btn-primary" />
+                </div>
+                <div class="form-group">
+                    <input asp-for="id" type="hidden" value="@ViewData.Model.id" />
+                    <input asp-for="name" type="hidden" value="@ViewData.Model.name" />
+                </div>
+            </form>
+        }
+
+    }
+    @if (bills.Count == 0){
+    <span>No Bills!</span>
     }
     <h3>Update Contact</h3>
     <form asp-controller="Patient" asp-action="updateContact">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label asp-for="phone" class="control-label"></label>
-            <input asp-for="phone" type="text" />
+            <input class="form-text" asp-for="phone" type="text" />
         </div>
         <div class="form-group">
             <input asp-for="id" type="hidden" value="@ViewData.Model.id" />
@@ -103,17 +109,50 @@
         </div>
         <div class="form-group">
             <label asp-for="address" class="control-label"></label>
-            <input asp-for="address" type="text"/>
+            <input class="form-text" asp-for="address" type="text"/>
         </div>
         <div class="form-group">
             <input type="submit" value="Update Contact Information" class="btn btn-primary" />
         </div>
     </form>
+    <form asp-controller="Patient" asp-action="viewPrescriptions">
+    <div class="btn-lg">
+            <input asp-for="id" type="hidden" value="@ViewData.Model.id" />
+            <input asp-for="name" type="hidden" value="@ViewData.Model.name.ToString()" />
+            <input type="submit" value="View Prescriptions" class="btn btn-primary" />
+    </div>
+    </form>
+    <h4>Upcoming Appointments</h4>
+    <div class="table-bordered">
+
+        @Html.Raw(sched)
+
+    </div>
 </div>
     <style>
-        form{
+    form{
         background-color:palevioletred;
-
+    }
+    table{
+        background-color:grey;
+    }
+    h3{
+       background-color:lightpink;
+    }
+    h4{
+       background-color:lightgrey;
     }
     </style>
+<script type="text/javascript">
+    var element = document.getElementById("o_sel");
+    var nameValue = element.options[element.selectedIndex].text;
+    if(nameValue == "Add"){
+        var elements = document.getElementsByClassName('del')
+        elements.forEach(el => el.style.visibility = 'hidden');
+    }
+    else{
+        var elements=document.getElementsByClassName('add')
+        elements.forEach(el => el.style.visibility = 'hidden');
+    }
+    </script>
 

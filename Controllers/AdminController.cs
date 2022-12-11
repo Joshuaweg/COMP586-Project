@@ -8,6 +8,10 @@ namespace WebApplication1.Controllers
         {
             return View();
         }
+        public IActionResult Back(Admin ad)
+        {
+            return View("Index",ad);
+        }
         public async Task<IActionResult> fireDoctor(Admin ad) {
             await ad.manageDoctors();
             return View("Index", ad);        
@@ -21,6 +25,10 @@ namespace WebApplication1.Controllers
         {
             await ad.orderSupplies();
             return View("Index", ad);
+        }
+        public async Task<IActionResult> displayOrders(Admin ad) {
+            ad.payload = await ad.getSupplies();
+            return View("Orders", ad);
         }
     }
 }

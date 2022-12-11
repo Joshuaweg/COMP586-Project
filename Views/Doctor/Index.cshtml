@@ -24,18 +24,15 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">
+    <h1>
         @ViewData.Model.name.ToString()
         </h1>
-       <section>
-        @Html.Raw(schedule)
-    </section>
     <h3>Order Prescriptions for Patients</h3>
     <form asp-controller="Doctor" asp-action="orderPrescription">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
        <div class="form-group">
-        <select asp-for="patientName">
+        <select class="form-select" asp-for="patientName">
             @foreach (Dictionary<string, object> pa in pats)
             {
                 <option value=@pa["patient"]>@pa["patient"]</option>
@@ -44,7 +41,7 @@
         </div>
         <div class="form-group">
             <label asp-for="prescriptionName" class="control-label"></label>
-            <input name="prescriptionName" asp-for="prescriptionName" class="form-control" type="text" />
+            <input class="form-text" name="prescriptionName" asp-for="prescriptionName" class="form-control" type="text" />
             <span asp-validation-for="prescriptionName" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -63,7 +60,7 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
-        <select asp-for="patientName">
+        <select class="form-select" asp-for="patientName">
             @foreach (Dictionary<string, object> pa in pats)
             {
                 <option value=@pa["patient"]>@pa["patient"]</option>
@@ -80,10 +77,24 @@
             <input type="submit" value="View Patient" class="btn btn-primary" />
         </div>
     </form>
+    <div class="table-bordered">
+    <h3>Upcoming Appointments</h3>
+    
+        @Html.Raw(schedule)
+    </div>
 
 </div>
 <style>
     form {
-        background-color: cyan;
+         background-color: cyan;
+    }
+    table{
+        background-color:grey;
+    }
+    h3{
+       background-color:lightblue;
+    }
+    h4{
+       background-color:lightgrey;
     }
 </style>

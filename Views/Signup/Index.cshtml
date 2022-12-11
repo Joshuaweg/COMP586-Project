@@ -1,0 +1,68 @@
+﻿ @model WebApplication1.Models.SignupModel;
+ @using FirebaseConnector.Controllers;
+@{
+    FireBaseController fb = new FireBaseController();
+    DateTime dt = DateTime.Now;
+    string today = dt.ToString("f");
+    List<Dictionary<string, object>> doctors = await fb.getQuery("doctors", new List<string>() { "id", "name" });
+ }
+<h4>Patient Sign Up Form</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="Signup" asp-action="newPatient">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="patient" class="control-label">Name</label>
+                <input asp-for="patient" class="form-control" type="text"/>
+                <span asp-validation-for="patient" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="username" class="control-label"></label>
+                <input asp-for="username" class="form-control" />
+                <span asp-validation-for="username " class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="password" class="control-label"></label>
+                <input asp-for="password" class="form-control" type="password"/>
+                <span asp-validation-for="password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="address" class="control-label">Address</label>
+                <input asp-for="address" class="form-control" type="text" />
+                <span asp-validation-for="address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="phonenumber" class="control-label">Phone Number</label>
+                <input asp-for="phonenumber" class="form-control" type="text" />
+                <span asp-validation-for="phonenumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="dateofbirth" class="control-label">Date of Birth</label>
+                <input asp-for="dateofbirth" class="form-control" type="date" value="@today" />
+                <span asp-validation-for="dateofbirth"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="currentdoctor" class="control-label"></label>
+                <select asp-for="currentdoctor" class="form-control">
+                    @foreach (Dictionary<string, object> doc in doctors)
+                    {
+                        <option value=@doc["id"]>@doc["name"]</option>
+                    }
+                </select>
+                <span asp-validation-for="currentdoctor"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Login" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

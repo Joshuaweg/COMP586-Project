@@ -17,7 +17,7 @@ namespace FirebaseConnector.Controllers
             DocumentReference docRef = connect.Collection("ordersupplies").Document(record.id.ToString()+record.name+record.amount.ToString()+"supplies");
             object[] param = new object[] { record.name, record.amount, record.id };
             Dictionary<string, object> order = new Dictionary<string, object>();
-            if (record.id != null) order.Add("ID", record.id);
+            if (record.id != null) order.Add("id", record.id);
             if (record.name != null) order.Add("name", record.name);
             if (record.amount != null) order.Add("amount", record.amount);
             await docRef.SetAsync(order, SetOptions.MergeAll);

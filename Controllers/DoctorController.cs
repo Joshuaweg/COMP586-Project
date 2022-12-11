@@ -19,7 +19,7 @@ namespace WebApplication1.Controllers
 
         public async Task<string> ViewSchedule(Doctor doc)
         {
-            string p_sched = "<table><caption>Upcoming Appoinments</caption><tr><th>id</th><th>Doctor</th><th>Patient</th><th>Time</th></tr>\n";
+            string p_sched = "<table class=\"table\"><tr><th>id</th><th>Doctor</th><th>Patient</th><th>Time</th></tr>\n";
          
                 List<Dictionary<string,object>> sched = await doc.viewAppointments();
                 foreach (var appt in sched) {

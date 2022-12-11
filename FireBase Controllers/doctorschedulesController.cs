@@ -40,7 +40,7 @@ namespace FirebaseConnector.Controllers
         public async Task retrieveDocumentAsync(string documentid)
         {
             FirestoreDb connect = createConnection();
-            DocumentReference docRef = connect.Collection("doctorSchedules").Document(documentid);
+            DocumentReference docRef = connect.Collection("doctorschedules").Document(documentid);
             DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
             if (snapshot.Exists)
             {

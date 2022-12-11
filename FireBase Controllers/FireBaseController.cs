@@ -61,6 +61,21 @@ namespace FirebaseConnector.Controllers
            
             return querySnapshot;
         }
+        public async Task<QuerySnapshot> Query(string collect, Dictionary<string, object> fields,string sort)
+        {
+            FirestoreDb db = createConnection();
+            CollectionReference collectRef = db.Collection(collect);
+            Query query = collectRef;
+            foreach (string key in fields.Keys)
+            {
+                Console.WriteLine(key);
+                Console.WriteLine(fields[key]);
+                query = query.WhereEqualTo(key, fields[key]);
+            }
+            QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
+
+            return querySnapshot;
+        }
         public static async Task<int> createId(string collect) {
             int id = 0;
             FirestoreDb db = createConnection();

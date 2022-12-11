@@ -20,6 +20,7 @@ namespace WebApplication1.Models
         public Doctor d_user { get; set; }
         public Admin a_user { get; set; }
         public Patient p_user { get; set; }
+
         public async Task buildUser()
         {
             FireBaseController fb = new FireBaseController();

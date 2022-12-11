@@ -9676,9 +9676,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\joshu\\source\\repos\\COMP586 Front\\Comp586-master\\WebApplication1\\WebApplication1.csproj",
-      "projectName": "WebApplication1",
-      "projectPath": "C:\\Users\\joshu\\source\\repos\\COMP586 Front\\Comp586-master\\WebApplication1\\WebApplication1.csproj",
+      "projectUniqueName": "C:\\Users\\joshu\\source\\repos\\COMP586 Front\\Comp586-master\\WebApplication1\\HospitalManagementSystem.csproj",
+      "projectName": "HospitalManagementSystem",
+      "projectPath": "C:\\Users\\joshu\\source\\repos\\COMP586 Front\\Comp586-master\\WebApplication1\\HospitalManagementSystem.csproj",
       "packagesPath": "C:\\Users\\joshu\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\joshu\\source\\repos\\COMP586 Front\\Comp586-master\\WebApplication1\\obj\\",
       "projectStyle": "PackageReference",

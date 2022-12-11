@@ -52,7 +52,7 @@ public class Doctor : DoctorInterface{
         doctorschedulesController docsched = new doctorschedulesController();
         Dictionary<string, object> qu = new Dictionary<string, object>();
         qu.Add("doctor_id", this.id);
-        QuerySnapshot appointments= await docsched.Query("doctorschedules", qu);
+        QuerySnapshot appointments= await docsched.Query("doctorschedules", qu,"time");
         foreach (var appointment in appointments.Documents) {
             Dictionary<string, object> appt = appointment.ToDictionary();
             apointmentList.Add(appt);

@@ -18,10 +18,11 @@
     <h3>Manage Doctors</h3>
     <form asp-controller="Admin" asp-action="fireDoctor">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+        <input asp-for="id" class="form-control" value=@ViewData.Model.id type="hidden" />
+        <input asp-for="name" class="form-control" value=@ViewData.Model.name.ToString() type="hidden" />
         <div class="form-group">
             <label asp-for="doctor" class="control-label"></label>
-            <select asp-for="patient">
+            <select class="form-select" asp-for="patient">
                 @foreach (Dictionary<string, object> doc in doctors)
                 {
                     <option value=@doc["name"]>@doc["name"]</option>
@@ -34,14 +35,13 @@
             <input type="submit" value="Remove Doctor" class="btn btn-primary" />
         </div>
     </form>
-    <br /><br /><br />
     <h3>Bill Patients for Services</h3>
     <form asp-controller="Admin" asp-action="billPatient">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
             <label asp-for="patient" class="control-label"></label>
-            <select asp-for="patient">
+            <select class="form-select" asp-for="patient">
                 @foreach (Dictionary<string, object> pat in patients)
                 {
                     <option value=@pat["patient"]>@pat["patient"]</option>
@@ -51,7 +51,9 @@
         </div>
          <div class="form-group">
             <label asp-for="bill" class="control-label"></label>
-            <input asp-for="bill" class="form-control" type="text" />
+            <input asp-for="bill" class="form-text" type="text" />
+            <input asp-for="id" class="form-control" value=@ViewData.Model.id type="hidden" />
+            <input asp-for="name" class="form-control" value=@ViewData.Model.name.ToString() type="hidden" />
             <span asp-validation-for="bill" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -63,17 +65,26 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
-            <label asp-for="supp" class="control-label"></label>
-            <input asp-for="supp" class="form-control" type="text" />
+            <label  class="control-label">Supply</label>
+            <input class="form-text" asp-for="supp" class="form-control" type="text" />
             <span asp-validation-for="supp" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="quantity" class="control-label"></label>
-            <input asp-for="quantity" class="form-control" type="text" />
+            <input asp-for="quantity" class="form-text" type="text" />
             <span asp-validation-for="quantity" class="text-danger"></span>
+            <input asp-for="id" class="form-control" value=@ViewData.Model.id type="hidden" />
+            <input asp-for="name" class="form-control" value=@ViewData.Model.name.ToString() type="hidden" />
         </div>
         <div class="form-group">
             <input type="submit" value="Order Supplies" class="btn btn-primary" />
+        </div>
+    </form>
+    <form asp-controller="Admin" asp-action="displayOrders">
+        <div class="form-group">
+            <input asp-for="id" class="form-control" value=@ViewData.Model.id type="hidden" />
+            <input asp-for="name" class="form-control" value=@ViewData.Model.name.ToString() type="hidden" />
+            <input type="submit" value="Review Orders" class="btn btn-primary" />
         </div>
     </form>
 
@@ -82,5 +93,18 @@
     form{
       background-color:coral;
     
+    }
+
+
+    table {
+        background-color: grey;
+    }
+
+    h3 {
+        background-color: orange;
+    }
+
+    h4 {
+        background-color: lightgrey;
     }
 </style>

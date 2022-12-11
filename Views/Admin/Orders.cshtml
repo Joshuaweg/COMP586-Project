@@ -1,0 +1,45 @@
+﻿@{
+    @model Admin;
+    @using Google.Cloud.Firestore;
+    @using FirebaseConnector.Controllers;
+    ViewData["Title"] = "Admin-"+ViewData.Model.name;
+    List<Dictionary<string,object>> orders = (List<Dictionary<string,object>>)ViewData.Model.payload;
+}
+<form class="btn-lg" asp-controller="Admin" asp-action="Back">
+    <input type="submit" value="Back" />
+    <input asp-for="name" input type="hidden" value="@ViewData.Model.name" />
+    <input asp-for="id" input type="hidden" value="@ViewData.Model.id" />
+
+</form>
+<div class="text-center">
+    <h1 class="display-4">
+        @ViewData.Model.name.ToString()
+    </h1>
+    
+    <h3>Orders</h3>
+    <table class="table">
+        <tr><th>Supply</th><th>Amount</th></tr>
+        @foreach(var ord in orders){
+        <tr><td>@ord["name"]</td><td>@ord["amount"]</td></tr>
+        }
+    </table>
+</div>
+<style>
+    form{
+      background-color:coral;
+    
+    }
+
+
+    table {
+        background-color: beige;
+    }
+
+    h3 {
+        background-color: orange;
+    }
+
+    h4 {
+        background-color: lightgrey;
+    }
+</style>

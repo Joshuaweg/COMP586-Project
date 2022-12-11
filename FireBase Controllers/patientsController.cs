@@ -23,7 +23,7 @@ namespace FirebaseConnector.Controllers
             if (record.address != null) patient.Add("address", record.address);
             if (record.currentdoctor != null) patient.Add("currentdoctor", record.currentdoctor);
             if (record.phonenumber != null) patient.Add("phonenumber", record.phonenumber);
-            if (record.dateofbirth != DateTime.MinValue) patient.Add("dateofbirth", record.dateofbirth);
+            if (record.dateofbirth != DateTime.MinValue) patient.Add("dateofbirth", record.dateofbirth.ToUniversalTime());
             if (record.username != null) patient.Add("username", record.username);
             if (record.password != null) patient.Add("password", SHA256Hasher.ComputeHash(record.password));
             await docRef.SetAsync(patient, SetOptions.MergeAll);

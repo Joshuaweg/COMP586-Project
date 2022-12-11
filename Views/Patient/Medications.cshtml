@@ -1,0 +1,29 @@
+﻿@{
+    @model Patient;
+    @using WebApplication1.Controllers;
+    @using Google.Cloud.Firestore;
+    @using FirebaseConnector.Controllers
+    ViewData["Title"] = "Medications-"+ViewData.Model.name.ToString();
+    var result = ViewData.Model.payload;
+    List<Dictionary<string, object>> res = (List<Dictionary<string, object>>)result;
+    foreach (var pres in res)
+    {
+        Console.WriteLine(pres["prescriptions"].ToString());
+
+    }
+   
+}
+<form class="btn-lg" asp-controller="Patient" asp-action="Back">
+    <input type="submit" value="Back" />
+    <input asp-for="name" input type="hidden" value="@ViewData.Model.name" />
+    <input asp-for="id" input type="hidden" value="@ViewData.Model.id" />
+
+</form>
+<div class="text-center table">
+    <table><tr><th>Prescription</th></tr>
+    @foreach(var pres in res){
+        <tr><td>@pres["prescriptions"].ToString()</td></tr>
+    }
+    </table>
+</div>
+
