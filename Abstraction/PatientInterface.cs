@@ -9,7 +9,5 @@ public abstract class PatientInterface {
     public abstract Task payBill();
     public abstract Task updateInformation();
 
-    private protected NpgsqlConnection GetConnection() {
-        return new NpgsqlConnection(@"Server=localhost;Port=5432;User Id=postgres; Password=comp586;Database=postgres");
-    }
+    
 }

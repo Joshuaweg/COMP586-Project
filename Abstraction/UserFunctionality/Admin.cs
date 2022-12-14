@@ -7,14 +7,22 @@ using FirebaseConnector.Models;
 using Google.Cloud.Firestore;
 
 public class Admin : AdminInterface {
+    //User Info
     public int id { get; set; }
-    public object payload { get; set; }
     public string name { get; set; }
+
+    //for sending any info from one view to the next
+    public object payload { get; set; }
+    //form fields
+        //orderSupplies
     public string supp { get; set; }
-    public string doctor { get; set; }
-    public string patient { get; set; }
     public string quantity { get; set; }
+        //manageDoctors
+    public string doctor { get; set; }
+       //billCustomer
+    public string patient { get; set; }
     public string bill { get; set; }
+    //end of form fields
     public Admin(string name) {
         this.name = name.ToLower();
     }

@@ -1,4 +1,4 @@
-﻿using Google.Cloud.Firestore;
+﻿ using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Services;

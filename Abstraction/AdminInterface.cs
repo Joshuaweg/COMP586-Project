@@ -8,7 +8,5 @@ public abstract class AdminInterface {
     public abstract Task manageDoctors();
     public abstract Task billCustomer();
 
-    private protected NpgsqlConnection GetConnection() {
-        return new NpgsqlConnection(@"Server=localhost;Port=5432;User Id=postgres; Password=comp586;Database=postgres");
-    }
+    
 }

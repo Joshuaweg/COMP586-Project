@@ -45,14 +45,13 @@ public class Doctor : DoctorInterface{
 
     }
 
-
     public override async Task<List<Dictionary<string,object>>> viewAppointments() {
         Console.WriteLine("\nList of Appointments: ");
         List<Dictionary<string, object>> apointmentList = new List<Dictionary<string,object>>();
         doctorschedulesController docsched = new doctorschedulesController();
         Dictionary<string, object> qu = new Dictionary<string, object>();
         qu.Add("doctor_id", this.id);
-        QuerySnapshot appointments= await docsched.Query("doctorschedules", qu,"time");
+        QuerySnapshot appointments= await docsched.Query("doctorschedules", qu);
         foreach (var appointment in appointments.Documents) {
             Dictionary<string, object> appt = appointment.ToDictionary();
             apointmentList.Add(appt);
@@ -97,70 +96,7 @@ public class Doctor : DoctorInterface{
 
     }
 
-    public async Task<List<Dictionary<string,object>>> readComments() {
-        List<Dictionary<string, object>> comments = new List<Dictionary<string, object>>();
-        bool found = false;
-        Dictionary<string, object> fields = new Dictionary<string, object>();
-        fields.Add("doctor", name);
-        patienttodoctorcommentsController pc = new patienttodoctorcommentsController();
-
-        QuerySnapshot qu = await pc.Query("patienttodoctorcomments", fields);
-        foreach (var comm in qu.Documents)
-        {
-            Dictionary<string, object> co = comm.ToDictionary();
-            comments.Add(co);
-            foreach (KeyValuePair<string, object> pair in co)
-            {
-                Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
-            }
-
-        }
-        qu = await pc.Query("admintodoctorcomments", fields);
-        foreach (var comm in qu.Documents)
-        {
-            Dictionary<string, object> co = comm.ToDictionary();
-            comments.Add(co);
-            foreach (KeyValuePair<string, object> pair in co)
-            {
-                Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
-            }
-
-        }
-
-
-        return comments;
-    }
-
-    public async Task writeComments(string recepient, string message) {
-        Dictionary<string, object> fields = new Dictionary<string, object>();
-        fields.Add("doctor", name);
-        fields.Add("patient", recepient);
-        doctortoadmincommentsController ac = new doctortoadmincommentsController();
-        doctortopatientcommentsController pc = new doctortopatientcommentsController();
-        QuerySnapshot qu = await ac.Query("patients", fields);
-        bool found = false;
-        if (qu != null) {
-            doctortopatientcomments dc = new doctortopatientcomments();
-            dc.patient = recepient;
-            dc.doctor = name;
-            dc.message=message;
-            await pc.addDocumentAsync(dc,name+"to"+recepient);
-            found = true;
-        }
-        fields.Remove("patient");
-        fields.Add("admin", recepient);
-        qu = await ac.Query("admininchargeofdoctor", fields);
-        if (qu != null) {
-            doctortoadmincomments dca = new doctortoadmincomments();
-            dca.admin = recepient;
-            dca.doctor = name;
-            dca.message = message;
-            await ac.addDocumentAsync(dca);
-            found = true;
-        }
-        if (!found) Console.WriteLine("Not found");
-
-    }
+    
 
     //Look at schedule X
     //Write comments about patients X

@@ -12,7 +12,7 @@ namespace FirebaseConnector.Controllers
 {
     internal class patientsController:FireBaseController
     {
-        public async Task addDocumentAsync(patients record)
+        public async Task<int> addDocumentAsync(patients record)
         {
             FirestoreDb connect = createConnection();
             record.id = await createId("patients");
@@ -27,7 +27,7 @@ namespace FirebaseConnector.Controllers
             if (record.username != null) patient.Add("username", record.username);
             if (record.password != null) patient.Add("password", SHA256Hasher.ComputeHash(record.password));
             await docRef.SetAsync(patient, SetOptions.MergeAll);
-
+            return record.id;
         }
         public async Task deleteDocumentAsync(string documentid)
         {

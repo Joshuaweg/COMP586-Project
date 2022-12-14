@@ -18,7 +18,6 @@ namespace WebApplication1.Controllers
             return View("Index",pat);
         }
 
-        // GET: PatientController/Details/5
         public async Task<string> viewSchedule(Patient pat) {
             string sched = "<table class=\"table\"><tr><th>ID</th><th>name</th><th>patient</th><th>Time</th></tr>\n";
             patientappointmentsController pa = new patientappointmentsController();
@@ -123,7 +122,6 @@ namespace WebApplication1.Controllers
 
 
         }
-        // GET: PatientController/Create
         public async Task<IActionResult> updateContact(Patient pat) {
             await pat.updateInformation();
             return View("Index", pat); 
