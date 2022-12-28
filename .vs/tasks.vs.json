@@ -1,0 +1,15 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-COMP586-Project",
+      "appliesTo": "/",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-COMP586-Project",
+      "appliesTo": "/",
+      "type": "launch"
+    }
+  ]
+}

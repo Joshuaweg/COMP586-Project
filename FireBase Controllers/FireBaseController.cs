@@ -11,7 +11,7 @@ namespace FirebaseConnector.Controllers
     {
         public static FirestoreDb createConnection()
         {
-            string credential_path = @"..\WebApplication1\bin\Debug\net6.0\client_secret.json";
+            string credential_path = @"..\COMP586-Project\bin\Debug\net6.0\client_secret.json";
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credential_path);
 
             FirestoreDb db = FirestoreDb.Create("hosman-53b85");
